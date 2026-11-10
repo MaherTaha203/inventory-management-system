@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           test -f README.md
-          grep -q "Inventory and Goods Receiving PWA" README.md
+          grep -q "نظام الجرد والاستلام" README.md
           echo "Repository baseline checks passed."
 
       - name: Report current scaffold
