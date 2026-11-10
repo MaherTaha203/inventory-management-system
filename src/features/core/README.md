@@ -6,10 +6,20 @@ shared by stocktakes, receipts, catalog, reports and local drafts.
 ## Modules
 
 - `src/types/domain.ts`: persistence-independent domain contracts.
-- `src/lib/validation/quantity.ts`: quantity text validation.
-- `src/lib/validation/name.ts`: conservative name normalization and matching.
-- `src/lib/validation/date.ts`: operation date validation and display parsing.
+- `src/lib/validation`: quantity, date and conservative name validation.
 - `src/lib/utils`: date formatting, pagination and typed operation results.
+- `src/lib/local-drafts`: per-browser IndexedDB draft repository.
+
+## Local draft guarantees
+
+- One draft per operation type on each browser/device.
+- Stocktake and receipt drafts are stored independently.
+- Creating a new operation never overwrites an existing draft.
+- Resume is a read; updates are explicit saves after each input change.
+- Draft deletion is explicit. Central-save cleanup must happen only after the
+  central service confirms success.
+- Local drafts are not central records and must not appear in archive or reports.
+- Browser storage can be lost when the user clears site data or changes device.
 
 ## Rules
 
