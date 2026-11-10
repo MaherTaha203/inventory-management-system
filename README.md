@@ -1,2 +1,54 @@
-# inventory-management-system
-Inventory and Goods Receiving PWA
+# نظام الجرد والاستلام
+
+تطبيق ويب تقدمي (PWA) باللغة العربية وواجهة RTL لإدارة **عمليات الجرد** و**سندات استلام البضائع** بصورة مستقلة.
+
+## القرارات التقنية
+
+- **Next.js 16.4.6 (App Router) + React + TypeScript** لواجهة ويب متجاوبة.
+- **Tailwind CSS 4** للتنسيق.
+- **Supabase PostgreSQL + Realtime** كخلفية مركزية مقترحة، مع `@supabase/ssr` لربط الخادم والمتصفح.
+- **IndexedDB** للمسودات المحلية التي لا تنتقل بين الأجهزة.
+- **Zod** للتحقق من المدخلات.
+- **Vitest** لاختبارات الوحدات، مع ESLint وTypeScript للفحص الساكن.
+- النشر المستهدف: **Vercel** بعد استكمال التطبيق وربط الخدمات.
+
+## متطلبات التشغيل
+
+- Node.js 22 أو أحدث.
+- npm.
+
+## أوامر التطوير
+
+```bash
+npm install
+npm run dev
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+## متغيرات البيئة
+
+انسخ `.env.example` إلى `.env.local` وأدخل بيانات Supabase عند إنشاء المشروع. لا تضع مفاتيح حقيقية في Git.
+
+## بنية المشروع
+
+```text
+src/
+  app/                 صفحات Next.js وإعدادات PWA
+  features/
+    stocktakes/        مجال الجرد
+    receipts/          مجال الاستلام
+    catalog/           الأصناف والموردون والوحدات
+    reports/           الأرشيف والتقارير
+  lib/
+    supabase/          عملاء Supabase
+    local-drafts/      المسودات المحلية
+    validation/        قواعد التحقق
+  types/               الأنواع المشتركة
+```
+
+## حدود هذه المرحلة
+
+هذا **هيكل تأسيسي فقط**. لم يتم إنشاء جداول أو ترحيلات SQL، ولم يتم الاتصال بمشروع Supabase أو تنفيذ أي استعلام. كما لم تُنفذ بعد وظائف الحفظ أو الدخول أو المزامنة أو إدارة المسودات.
