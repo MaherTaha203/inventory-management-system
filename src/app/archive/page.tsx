@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useInventoryChanges } from "@/lib/realtime/use-inventory-changes";
 
 type OperationKind = "stocktake" | "receipt";
 
@@ -94,6 +95,8 @@ export default function ArchivePage() {
       setLoading(false);
     }
   }, [from, kind, page, search, to]);
+
+  useInventoryChanges(() => { void load(); });
 
   useEffect(() => {
     const task = window.setTimeout(() => void load(), 0);
