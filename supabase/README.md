@@ -1,6 +1,6 @@
 # Database migrations
 
-These migrations define the new **Inventory & Receiving** data model. All 15 migrations are committed on `develop` and have been applied successfully to the connected Supabase project.
+These migrations define the new **Inventory & Receiving** data model. All 16 migrations are committed on `develop` and have been applied successfully to the connected Supabase project.
 
 ## Target project
 
@@ -27,6 +27,7 @@ Apply the SQL files in timestamp order:
 13. `20261111001300_shared_report_preferences.sql`
 14. `20261111001400_item_history.sql`
 15. `20261111001500_full_year_stocktake_number.sql`
+16. `20261111001600_unique_active_catalog_names.sql`
 
 Do not skip a migration or apply them out of order. Review the complete SQL before applying it to the hosted project.
 
@@ -71,7 +72,7 @@ Migration 6 installs a daily `pg_cron` job only if the extension is already enab
 
 Confirmed on the connected Supabase project:
 
-- All 15 new migration records are present.
+- All 16 new migration records are present.
 - All new tables have RLS enabled.
 - `anon` and `authenticated` have no table access to the new catalog data; the server role has the required access.
 - Privileged save routines are executable by `service_role`, not by `anon` or `authenticated`.
