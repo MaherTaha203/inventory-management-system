@@ -118,6 +118,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       return NextResponse.json({ error: "تعذر إفراغ سلة المحذوفات." }, { status: 500 });
     }
+    await publishInventoryChange();
     return NextResponse.json({ ok: true, deleted: data });
   }
 
@@ -146,5 +147,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  await publishInventoryChange();
   return NextResponse.json({ ok: true });
 }
