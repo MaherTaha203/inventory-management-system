@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { LocalDraft, OperationKind } from "@/types/domain";
 import {
   LocalDraftRepository,
@@ -48,6 +49,7 @@ export default function OperationDraftEditor({
 }: {
   operation: OperationKind;
 }) {
+  const router = useRouter();
   const isReceipt = operation === "receipt";
   const title = isReceipt ? "إدخال سند استلام" : "إدخال عملية جرد";
   const [phase, setPhase] = useState<Phase>("loading");
@@ -56,6 +58,7 @@ export default function OperationDraftEditor({
   const [saveState, setSaveState] = useState<"saved" | "saving" | "failed">("saved");
   const [errorMessage, setErrorMessage] = useState("");
   const [validationAttempted, setValidationAttempted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const validation = payload ? validateOperationDraft(operation, payload) : null;
   const writeQueue = useRef<Promise<void>>(Promise.resolve());
   const initialized = useRef(false);
@@ -164,6 +167,61 @@ export default function OperationDraftEditor({
     });
   }
 
+  async function saveCentral() {
+    setValidationAttempted(true);
+    if (!payload || !validation?.valid || submitting || saveState !== "saved") return;
+
+    setSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      await writeQueue.current;
+      await repository.save(createOperationDraft(operation, payload));
+
+      const endpoint =
+        operation === "stocktake"
+          ? "/api/operations/stocktakes"
+          : "/api/operations/receipts";
+      const body = {
+        operationId: null,
+        date: payload.date,
+        ...(isReceipt ? { supplierId: payload.supplierId ?? null } : {}),
+        lines: payload.lines.map((line) => ({
+          itemId: line.itemId,
+          quantity: line.quantity,
+          unitId: line.unitId,
+        })),
+      };
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        id?: string;
+      };
+
+      if (!response.ok || !result.id) {
+        setErrorMessage(result.error ?? "تعذر حفظ العملية مركزياً. بقيت المسودة محفوظة على هذا الجهاز.");
+        return;
+      }
+
+      try {
+        await repository.removeAfterCentralSave(operation);
+      } catch {
+        setErrorMessage("تم حفظ العملية مركزياً، لكن تعذر حذف المسودة المحلية.");
+      }
+
+      router.push(`/archive?kind=${operation}`);
+    } catch {
+      setErrorMessage("تعذر الاتصال أو حفظ العملية. بقيت المسودة المحلية كما هي.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-8 sm:px-6">
       <nav className="mb-8 flex items-center justify-between">
@@ -174,7 +232,7 @@ export default function OperationDraftEditor({
       <header className="mb-7">
         <h1 className="text-2xl font-bold">{title}</h1>
         <p className="mt-2 text-sm leading-7 text-[var(--muted)]">
-          تحفظ التغييرات تلقائياً على هذا الجهاز فقط. لا تُرسل المسودة إلى السجلات المركزية.
+تحفظ التغييرات تلقائياً على هذا الجهاز، ولا تُرسل إلى السجلات المركزية إلا عند الضغط على حفظ العملية.
         </p>
       </header>
 
@@ -307,6 +365,7 @@ export default function OperationDraftEditor({
                       placeholder="مثلاً: قطعة، كرتونة، كغم"
                       onChange={(unitName, unitId) => updateLine(line.id, { unitName: unitName || null, unitId })}
                     />
+                    {validationAttempted && validation?.errors.lines[line.id]?.unitName && <p className="mt-2 text-xs text-red-700">{validation.errors.lines[line.id].unitName}</p>}
                   </div>
                 </div>
                 {validationAttempted && validation?.duplicateLineIds.includes(line.id) && <p className="mt-3 text-xs text-amber-700">تنبيه: هذا الصنف مكرر بنفس الوحدة في العملية. يمكنك الإبقاء عليه إذا كان مقصوداً.</p>}
@@ -317,16 +376,26 @@ export default function OperationDraftEditor({
           <button onClick={addLine} className="w-full rounded-xl border border-dashed border-[var(--accent)] bg-white px-4 py-3 text-sm font-semibold text-[var(--accent)]">
             + إضافة صنف
           </button>
-          <button onClick={() => setValidationAttempted(true)} className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white">
-            التحقق من البيانات
-          </button>
-          {validationAttempted && validation && (
-            <p role="status" className={`rounded-xl p-4 text-sm leading-6 ${validation.valid ? "bg-emerald-50 text-emerald-800" : "bg-red-50 text-red-800"}`}>
-              {validation.valid ? "البيانات مستوفية لقواعد الإدخال. لم يتم حفظها كسجل مركزي." : "توجد بيانات تحتاج إلى تصحيح. راجع الحقول الموضحة أعلاه."}
+          {errorMessage && (
+            <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm leading-6 text-red-800">
+              {errorMessage}
             </p>
           )}
+          {validationAttempted && validation && !validation.valid && (
+            <p role="status" className="rounded-xl bg-red-50 p-4 text-sm leading-6 text-red-800">
+              توجد بيانات تحتاج إلى تصحيح. راجع الحقول الموضحة أعلاه.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => void saveCentral()}
+            disabled={submitting || saveState !== "saved"}
+            className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitting ? "جارٍ حفظ العملية…" : "حفظ العملية"}
+          </button>
           <p className="rounded-xl bg-slate-100 p-4 text-xs leading-6 text-[var(--muted)]">
-            هذه المرحلة تحفظ المسودة على الجهاز فقط. لم يتم بعد ربط زر الحفظ بالسجلات المركزية أو إنشاء رقم عملية.
+            عند نجاح الحفظ يُنشأ رقم العملية في قاعدة البيانات وتُحذف المسودة المحلية. إذا فشل الحفظ تبقى المسودة كما هي.
           </p>
         </section>
       )}
