@@ -263,6 +263,12 @@ export default function ArchivePage() {
                     <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs">
                       {lines.length} سطور
                     </span>
+                    <Link
+                      href={`/${kind === "stocktake" ? "stocktakes" : "receipts"}/${entry.id}`}
+                      className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold"
+                    >
+                      تعديل
+                    </Link>
                     <button
                       type="button"
                       disabled={busyId === entry.id}
