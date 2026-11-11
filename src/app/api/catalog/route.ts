@@ -218,6 +218,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  await publishInventoryChange();
   return NextResponse.json(
     {
       entry: { id: entry.id, name: entry.name, isArchived: false },
@@ -292,6 +293,7 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
+  await publishInventoryChange();
   return NextResponse.json({
     entry: {
       id: entry.id,
@@ -346,5 +348,6 @@ export async function DELETE(request: NextRequest) {
     );
   }
 
+  await publishInventoryChange();
   return NextResponse.json({ ok: true });
 }
