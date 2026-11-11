@@ -3,6 +3,7 @@ import { z } from "zod";
 import { hasValidSession } from "@/lib/auth/guard";
 import { hasSameOrigin } from "@/lib/auth/http";
 import { getPrivilegedDatabaseClient } from "@/lib/supabase/query-client";
+import { publishInventoryChange } from "@/lib/realtime/publish-inventory-change";
 
 const stocktakeColumns = [
   "operation_number",
@@ -100,5 +101,6 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "تعذر حفظ إعدادات الأعمدة." }, { status: 500 });
   }
 
+  await publishInventoryChange();
   return NextResponse.json({ ok: true, columns: selected });
 }
