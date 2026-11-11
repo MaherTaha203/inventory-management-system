@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { CatalogProvider } from "@/features/catalog/catalog-provider";
+import { AuthGate } from "@/features/auth/auth-gate";
 
 export const metadata: Metadata = {
   title: "نظام الجرد والاستلام",
@@ -22,7 +23,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body><CatalogProvider>{children}</CatalogProvider></body>
+      <body>
+        <AuthGate>
+          <CatalogProvider>{children}</CatalogProvider>
+        </AuthGate>
+      </body>
     </html>
   );
 }
