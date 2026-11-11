@@ -10,6 +10,11 @@ const modules = [
     href: "/receipts",
   },
   {
+    title: "القوائم",
+    description: "إدارة قوائم الأصناف والموردين والوحدات.",
+    href: "/catalog",
+  },
+  {
     title: "التقارير",
     description: "عرض السجلات والبحث والتصفية والتصدير.",
     href: "/reports",
