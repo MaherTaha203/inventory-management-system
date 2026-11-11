@@ -54,10 +54,14 @@ Configure these values in the trusted server environment (local `.env.local` and
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SECRET_KEY` — server-only; never expose it to browser code.
 - `INITIAL_SETUP_SECRET` — random secret of at least 32 characters used only for first-run PIN initialization.
+- `CRON_SECRET` — random secret of at least 32 characters used to authorize the daily Vercel cleanup task.
 
 Do not send or commit the secret key or setup secret.
 
 ## Scheduled purge
+
+Vercel runs `/api/cron/purge-trash` daily at 02:00 UTC using `CRON_SECRET`. Set the same secret in the Vercel project environment. The endpoint invokes `purge_expired_trash()` and never accepts browser-session authentication as a substitute.
+
 
 Migration 6 installs a daily `pg_cron` job only if the extension is already enabled and its scheduler function is available. The connected target project was checked and `pg_cron` is currently **not enabled**. Therefore, before production, configure a trusted server-side scheduled task (for example, a Vercel Cron route) to call `public.purge_expired_trash()` daily, or explicitly approve enabling and configuring `pg_cron`. Do not expose this routine to the browser.
 
