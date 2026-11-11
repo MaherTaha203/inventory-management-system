@@ -29,7 +29,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const table = isStocktake ? "stocktake_operations" : "receipt_operations";
   const columns = isStocktake
     ? "id, operation_number, operation_date, stocktake_lines(id, item_id, item_name_snapshot, quantity, unit_id, unit_name_snapshot, line_position)"
-    : "id, receipt_number, receipt_date, supplier_id, supplier_name_snapshot, receipt_lines(id, item_id, item_name_snapshot, quantity, unit_id, unit_name_snapshot)";
+    : "id, receipt_number, receipt_date, supplier_id, supplier_name_snapshot, receipt_lines(id, item_id, item_name_snapshot, quantity, unit_id, unit_name_snapshot, line_position)";
 
   const { data, error } = await getPrivilegedDatabaseClient()
     .from(table)
