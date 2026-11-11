@@ -9,6 +9,7 @@ const catalogKindSchema = z.enum(["items", "suppliers", "units"]);
 const createSchema = z.object({
   kind: catalogKindSchema,
   name: displayNameSchema,
+  confirmSimilar: z.boolean().optional(),
 });
 const updateSchema = z.object({
   kind: catalogKindSchema,
@@ -100,19 +101,38 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  let matches: Array<{ id: string; name: string }> = [];
   if (kind !== "units") {
     const { data: found, error: matchError } = await supabase
       .from(table)
-      .select("id, name")
+      .select("id, name, deleted_at")
       .eq("normalized_name", normalizeNameForMatch(name))
-      .is("deleted_at", null)
       .limit(10);
 
     if (matchError) {
       return NextResponse.json({ error: "تعذر التحقق من الأسماء المتشابهة." }, { status: 500 });
     }
-    matches = found ?? [];
+
+    const matches = found ?? [];
+    const activeMatches = matches
+      .filter((entry) => entry.deleted_at === null)
+      .map(({ id, name: matchedName }) => ({ id, name: matchedName }));
+    const deletedMatches = matches
+      .filter((entry) => entry.deleted_at !== null)
+      .map(({ id, name: matchedName }) => ({ id, name: matchedName }));
+
+    if (activeMatches.length > 0) {
+      return NextResponse.json(
+        { code: "NAME_MATCHES", matches: activeMatches, deletedSimilar: deletedMatches },
+        { status: 409 },
+      );
+    }
+
+    if (deletedMatches.length > 0 && !parsed.data.confirmSimilar) {
+      return NextResponse.json(
+        { code: "TRASH_SIMILAR", matches: deletedMatches },
+        { status: 409 },
+      );
+    }
   }
 
   const { data, error } = await supabase
@@ -128,7 +148,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(
     {
       entry: { id: data.id, name: data.name, isArchived: false },
-      similarMatches: matches,
     },
     { status: 201 },
   );
