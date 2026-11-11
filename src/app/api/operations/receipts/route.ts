@@ -33,58 +33,61 @@ type ReceiptListRow = {
   }>;
 };
 
+function isValidIsoDate(value: string): boolean {
+  const match = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year
+    && date.getUTCMonth() === month - 1
+    && date.getUTCDate() === day;
+}
+
 export async function GET(request: NextRequest) {
   if (!(await hasValidSession(request))) {
     return NextResponse.json({ error: "يلزم تسجيل الدخول." }, { status: 401 });
   }
 
-  const page = Math.max(
-    1,
-    Number.parseInt(request.nextUrl.searchParams.get("page") ?? "1", 10) || 1,
+  const page = Math.min(
+    1_000_000,
+    Math.max(1, Number.parseInt(request.nextUrl.searchParams.get("page") ?? "1", 10) || 1),
   );
-  const pageSize = 20;
   const search = request.nextUrl.searchParams.get("q")?.trim() ?? "";
   const from = request.nextUrl.searchParams.get("from");
   const to = request.nextUrl.searchParams.get("to");
 
-  if (from && !/^\d{4}-\d{2}-\d{2}$/.test(from)) {
+  if (from && !isValidIsoDate(from)) {
     return NextResponse.json({ error: "تاريخ البداية غير صحيح." }, { status: 400 });
   }
-  if (to && !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+  if (to && !isValidIsoDate(to)) {
     return NextResponse.json({ error: "تاريخ النهاية غير صحيح." }, { status: 400 });
   }
   if (from && to && from > to) {
-    return NextResponse.json({ error: "تاريخ البداية يجب ألا يتجاوز تاريخ النهاية." }, { status: 400 });
+    return NextResponse.json(
+      { error: "تاريخ البداية يجب ألا يتجاوز تاريخ النهاية." },
+      { status: 400 },
+    );
   }
 
-  let query = getPrivilegedDatabaseClient()
-    .from("receipt_operations")
-    .select(
-      "id, receipt_number, receipt_date, supplier_name_snapshot, receipt_lines(id, item_name_snapshot, quantity, unit_name_snapshot)",
-      { count: "exact" },
-    )
-    .is("deleted_at", null)
-    .order("receipt_date", { ascending: false })
-    .order("receipt_number", { ascending: false })
-    .range((page - 1) * pageSize, page * pageSize - 1);
-
-  if (from) query = query.gte("receipt_date", from);
-  if (to) query = query.lte("receipt_date", to);
-  if (search) query = query.ilike("receipt_number_text", "%" + search.replace(/[\\%_]/g, "\\$&") + "%");
-
-  const { data, error, count } = await query;
-  if (error) {
-    return NextResponse.json({ error: "تعذر تحميل أرشيف الاستلام." }, { status: 500 });
-  }
-
-  const rows = (data ?? []) as ReceiptListRow[];
-  return NextResponse.json({
-    entries: rows,
-    page,
-    pageSize,
-    totalRows: count ?? 0,
-    totalPages: Math.ceil((count ?? 0) / pageSize),
+  const { data, error } = await getPrivilegedDatabaseClient().rpc("search_receipts", {
+    p_query: search || null,
+    p_from: from || null,
+    p_to: to || null,
+    p_page: page,
+    p_page_size: 20,
   });
+
+  if (error) {
+    const invalid = error.code === "22023";
+    return NextResponse.json(
+      { error: invalid ? "معايير البحث أو الترقيم غير صحيحة." : "تعذر تحميل الأرشيف." },
+      { status: invalid ? 400 : 500 },
+    );
+  }
+
+  return NextResponse.json(data);
 }
 
 export async function POST(request: NextRequest) {
