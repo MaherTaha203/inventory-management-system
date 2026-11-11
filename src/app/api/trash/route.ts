@@ -99,15 +99,26 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => null);
   const parsed = z
-    .object({
-      action: z.enum(["restore", "purge"]),
-      type: entryTypeSchema,
-      id: z.string().uuid(),
-    })
+    .discriminatedUnion("action", [
+      z.object({
+        action: z.enum(["restore", "purge"]),
+        type: entryTypeSchema,
+        id: z.string().uuid(),
+      }),
+      z.object({ action: z.literal("empty") }),
+    ])
     .safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json({ error: "بيانات العملية غير صحيحة." }, { status: 400 });
+  }
+
+  if (parsed.data.action === "empty") {
+    const { data, error } = await getClient().rpc("empty_trash", {});
+    if (error) {
+      return NextResponse.json({ error: "تعذر إفراغ سلة المحذوفات." }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, deleted: data });
   }
 
   const functionName =
