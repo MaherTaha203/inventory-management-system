@@ -19,6 +19,11 @@ const modules = [
     description: "عرض السجلات والبحث والتصفية والتصدير.",
     href: "/reports",
   },
+  {
+    title: "سلة المحذوفات",
+    description: "استعادة السجلات أو حذفها نهائياً.",
+    href: "/trash",
+  },
 ];
 
 export default function HomePage() {
