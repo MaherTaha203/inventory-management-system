@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useInventoryChanges } from "@/lib/realtime/use-inventory-changes";
 
 type Kind = "stocktake" | "receipt";
 type ColumnKey =
@@ -126,6 +127,8 @@ export default function ReportsPage() {
       setLoading(false);
     }
   }, [from, kind, page, search, to]);
+
+  useInventoryChanges(() => { void load(); });
 
   useEffect(() => {
     const task = window.setTimeout(() => void load(), 0);
