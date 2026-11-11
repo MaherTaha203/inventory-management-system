@@ -15,6 +15,7 @@ import {
 import { getTodayISODate } from "@/lib/utils/date";
 import { formatISODate } from "@/lib/utils/date";
 import { validateOperationDraft } from "@/lib/validation/operation-draft";
+import { CatalogNameInput } from "@/features/catalog/catalog-name-input";
 
 type Phase = "loading" | "choice" | "editing" | "error";
 
@@ -247,13 +248,13 @@ export default function OperationDraftEditor({
             {validationAttempted && validation?.errors.date && <p className="mt-2 text-xs text-red-700">{validation.errors.date}</p>}
             {isReceipt && (
               <div className="mt-4">
-                <label className="block text-sm font-semibold" htmlFor="supplier-name">اسم المورد (اختياري)</label>
-                <input
-                  id="supplier-name"
+                <CatalogNameInput
+                  kind="suppliers"
+                  label="اسم المورد"
+                  optional
                   value={payload.supplierName ?? ""}
-                  onChange={(event) => updatePayload((current) => ({ ...current, supplierName: event.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-[var(--border)] px-4 py-3"
-                  aria-invalid={validationAttempted && Boolean(validation?.errors.supplierName)}
+                  selectedId={payload.supplierId ?? null}
+                  onChange={(supplierName, supplierId) => updatePayload((current) => ({ ...current, supplierName, supplierId }))}
                 />
                 {validationAttempted && validation?.errors.supplierName && <p className="mt-2 text-xs text-red-700">{validation.errors.supplierName}</p>}
               </div>
@@ -272,17 +273,17 @@ export default function OperationDraftEditor({
                   )}
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <label className="text-sm sm:col-span-3">
-                    اسم الصنف
-                    <input
+                  <div className="sm:col-span-3">
+                    <CatalogNameInput
+                      kind="items"
+                      label="اسم الصنف"
                       value={line.itemName}
-                      onChange={(event) => updateLine(line.id, { itemName: event.target.value })}
-                      className="mt-2 w-full rounded-xl border border-[var(--border)] px-4 py-3"
+                      selectedId={line.itemId}
                       placeholder="أدخل اسم الصنف"
-                      aria-invalid={validationAttempted && Boolean(validation?.errors.lines[line.id]?.itemName)}
+                      onChange={(itemName, itemId) => updateLine(line.id, { itemName, itemId })}
                     />
                     {validationAttempted && validation?.errors.lines[line.id]?.itemName && <p className="mt-2 text-xs text-red-700">{validation.errors.lines[line.id].itemName}</p>}
-                  </label>
+                  </div>
                   <label className="text-sm">
                     الكمية
                     <input
@@ -296,15 +297,17 @@ export default function OperationDraftEditor({
                     />
                     {validationAttempted && validation?.errors.lines[line.id]?.quantity && <p className="mt-2 text-xs text-red-700">{validation.errors.lines[line.id].quantity}</p>}
                   </label>
-                  <label className="text-sm sm:col-span-2">
-                    الوحدة (اختيارية)
-                    <input
+                  <div className="sm:col-span-2">
+                    <CatalogNameInput
+                      kind="units"
+                      label="الوحدة"
+                      optional
                       value={line.unitName ?? ""}
-                      onChange={(event) => updateLine(line.id, { unitName: event.target.value || null })}
-                      className="mt-2 w-full rounded-xl border border-[var(--border)] px-4 py-3"
+                      selectedId={line.unitId}
                       placeholder="مثلاً: قطعة، كرتونة، كغم"
+                      onChange={(unitName, unitId) => updateLine(line.id, { unitName: unitName || null, unitId })}
                     />
-                  </label>
+                  </div>
                 </div>
                 {validationAttempted && validation?.duplicateLineIds.includes(line.id) && <p className="mt-3 text-xs text-amber-700">تنبيه: هذا الصنف مكرر بنفس الوحدة في العملية. يمكنك الإبقاء عليه إذا كان مقصوداً.</p>}
               </article>
