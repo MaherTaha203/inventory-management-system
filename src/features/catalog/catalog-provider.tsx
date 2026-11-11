@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import { createCatalogEntry, type CatalogEntry, type CatalogKind } from "./catalog";
 import { displayNameSchema } from "@/lib/validation/name";
@@ -43,8 +43,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     }));
   }
 
-  const value = useMemo(() => ({ entries, add, rename, setArchived }), [entries]);
-  return <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>;
+  return <CatalogContext.Provider value={{ entries, add, rename, setArchived }}>{children}</CatalogContext.Provider>;
 }
 
 export function useCatalog() {
