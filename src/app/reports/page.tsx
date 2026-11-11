@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import * as XLSX from "xlsx";
 import { useInventoryChanges } from "@/lib/realtime/use-inventory-changes";
 
 type Kind = "stocktake" | "receipt";
@@ -170,18 +171,23 @@ export default function ReportsPage() {
 
   function exportExcel() {
     const visible = definitions[kind].filter((column) => columns[kind].includes(column.key));
-    const head = visible.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("");
-    const body = rows.map((row) =>
-      `<tr>${visible.map((column) => `<td>${escapeHtml(row[column.key] ?? "")}</td>`).join("")}</tr>`
-    ).join("");
-    const html = `<!doctype html><html><head><meta charset="utf-8"></head><body dir="rtl"><table dir="rtl"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></body></html>`;
-    const blob = new Blob(["\ufeff", html], { type: "application/vnd.ms-excel;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = kind === "stocktake" ? "تقرير-الجرد.xls" : "تقرير-الاستلام.xls";
-    anchor.click();
-    URL.revokeObjectURL(url);
+    const data = [
+      visible.map((column) => column.label),
+      ...rows.map((row) => visible.map((column) => String(row[column.key] ?? ""))),
+    ];
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    Reflect.set(worksheet, "!rtl", true);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      kind === "stocktake" ? "الجرد" : "الاستلام",
+    );
+    XLSX.writeFile(
+      workbook,
+      kind === "stocktake" ? "تقرير-الجرد.xlsx" : "تقرير-الاستلام.xlsx",
+      { bookType: "xlsx", compression: true },
+    );
   }
 
   function printReport() {
