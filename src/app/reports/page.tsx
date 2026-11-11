@@ -129,7 +129,15 @@ export default function ReportsPage() {
     }
   }, [from, kind, page, search, to]);
 
-  useInventoryChanges(() => { void load(); });
+  useInventoryChanges(() => {
+    void load();
+    void fetch("/api/reports/preferences", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : null)
+      .then((result: { stocktake: ColumnKey[]; receipt: ColumnKey[] } | null) => {
+        if (result) setColumns({ stocktake: result.stocktake, receipt: result.receipt });
+      })
+      .catch(() => undefined);
+  });
 
   useEffect(() => {
     const task = window.setTimeout(() => void load(), 0);
