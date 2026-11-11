@@ -21,19 +21,6 @@ const requestSchema = z.object({
 });
 
 
-type ReceiptListRow = {
-  id: string;
-  receipt_number: number;
-  receipt_date: string;
-  supplier_name_snapshot: string | null;
-  receipt_lines: Array<{
-    id: string;
-    item_name_snapshot: string;
-    quantity: number | string;
-    unit_name_snapshot: string | null;
-  }>;
-};
-
 function isValidIsoDate(value: string): boolean {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return false;
