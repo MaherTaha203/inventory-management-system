@@ -20,18 +20,6 @@ const requestSchema = z.object({
 });
 
 
-type StocktakeListRow = {
-  id: string;
-  operation_number: string;
-  operation_date: string;
-  stocktake_lines: Array<{
-    id: string;
-    item_name_snapshot: string;
-    quantity: number | string;
-    unit_name_snapshot: string | null;
-  }>;
-};
-
 function isValidIsoDate(value: string): boolean {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return false;
