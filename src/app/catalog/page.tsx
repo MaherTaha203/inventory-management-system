@@ -215,15 +215,24 @@ export default function CatalogPage() {
                     className="flex flex-wrap items-center justify-between gap-3 py-3"
                   >
                     <div>
-                      <span
-                        className={
-                          entry.isArchived
-                            ? "text-sm text-[var(--muted)] line-through"
-                            : "text-sm font-medium"
-                        }
-                      >
-                        {entry.name}
-                      </span>
+                      {section.kind === "items" && !entry.isArchived ? (
+                        <Link
+                          href={`/catalog/items/${entry.id}`}
+                          className="text-sm font-medium text-[var(--accent)]"
+                        >
+                          {entry.name}
+                        </Link>
+                      ) : (
+                        <span
+                          className={
+                            entry.isArchived
+                              ? "text-sm text-[var(--muted)] line-through"
+                              : "text-sm font-medium"
+                          }
+                        >
+                          {entry.name}
+                        </span>
+                      )}
                       {entry.isArchived && (
                         <span className="mr-2 text-xs text-[var(--muted)]">
                           مخفي من الاقتراحات
