@@ -19,6 +19,74 @@ const requestSchema = z.object({
   ).min(1),
 });
 
+
+type ReceiptListRow = {
+  id: string;
+  receipt_number: number;
+  receipt_date: string;
+  supplier_name_snapshot: string | null;
+  receipt_lines: Array<{
+    id: string;
+    item_name_snapshot: string;
+    quantity: number | string;
+    unit_name_snapshot: string | null;
+  }>;
+};
+
+export async function GET(request: NextRequest) {
+  if (!(await hasValidSession(request))) {
+    return NextResponse.json({ error: "يلزم تسجيل الدخول." }, { status: 401 });
+  }
+
+  const page = Math.max(
+    1,
+    Number.parseInt(request.nextUrl.searchParams.get("page") ?? "1", 10) || 1,
+  );
+  const pageSize = 20;
+  const search = request.nextUrl.searchParams.get("q")?.trim() ?? "";
+  const from = request.nextUrl.searchParams.get("from");
+  const to = request.nextUrl.searchParams.get("to");
+
+  if (from && !/^\d{4}-\d{2}-\d{2}$/.test(from)) {
+    return NextResponse.json({ error: "تاريخ البداية غير صحيح." }, { status: 400 });
+  }
+  if (to && !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+    return NextResponse.json({ error: "تاريخ النهاية غير صحيح." }, { status: 400 });
+  }
+  if (from && to && from > to) {
+    return NextResponse.json({ error: "تاريخ البداية يجب ألا يتجاوز تاريخ النهاية." }, { status: 400 });
+  }
+
+  let query = getPrivilegedDatabaseClient()
+    .from("receipt_operations")
+    .select(
+      "id, receipt_number, receipt_date, supplier_name_snapshot, receipt_lines(id, item_name_snapshot, quantity, unit_name_snapshot)",
+      { count: "exact" },
+    )
+    .is("deleted_at", null)
+    .order("receipt_date", { ascending: false })
+    .order("receipt_number", { ascending: false })
+    .range((page - 1) * pageSize, page * pageSize - 1);
+
+  if (from) query = query.gte("receipt_date", from);
+  if (to) query = query.lte("receipt_date", to);
+  if (search) query = query.ilike("receipt_number", `%${search.replace(/[\\%_]/g, "\\export async function POST(request: NextRequest) {")}%`);
+
+  const { data, error, count } = await query;
+  if (error) {
+    return NextResponse.json({ error: "تعذر تحميل أرشيف الاستلام." }, { status: 500 });
+  }
+
+  const rows = (data ?? []) as ReceiptListRow[];
+  return NextResponse.json({
+    entries: rows,
+    page,
+    pageSize,
+    totalRows: count ?? 0,
+    totalPages: Math.ceil((count ?? 0) / pageSize),
+  });
+}
+
 export async function POST(request: NextRequest) {
   if (!hasSameOrigin(request)) {
     return NextResponse.json({ error: "طلب غير مسموح." }, { status: 403 });
