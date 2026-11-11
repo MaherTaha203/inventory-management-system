@@ -1,6 +1,6 @@
 # Database migrations
 
-These migrations define the new **Inventory & Receiving** data model. They are prepared on the `develop` branch and are **not applied** to the connected Supabase project yet.
+These migrations define the new **Inventory & Receiving** data model. All 11 migrations are committed on `develop` and have been applied successfully to the connected Supabase project.
 
 ## Target project
 
@@ -44,13 +44,39 @@ Do not skip a migration or apply them out of order. Review the complete SQL befo
 - Use `public.soft_delete_trash_entry(type, id)` for ordinary deletion, `public.restore_trash_entry(type, id)` for restoration, `public.purge_trash_entry(type, id)` for immediate permanent deletion, and `public.empty_trash()` to empty the trash immediately.
 - `public.purge_expired_trash()` removes entries whose 30-day retention has elapsed.
 
+## Required server environment
+
+Configure these values in the trusted server environment (local `.env.local` and the deployment platform):
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY` — server-only; never expose it to browser code.
+- `INITIAL_SETUP_SECRET` — random secret of at least 32 characters used only for first-run PIN initialization.
+
+Do not send or commit the secret key or setup secret.
+
 ## Scheduled purge
 
 Migration 6 installs a daily `pg_cron` job only if the extension is already enabled and its scheduler function is available. The connected target project was checked and `pg_cron` is currently **not enabled**. Therefore, before production, configure a trusted server-side scheduled task (for example, a Vercel Cron route) to call `public.purge_expired_trash()` daily, or explicitly approve enabling and configuring `pg_cron`. Do not expose this routine to the browser.
 
+## Verification status
+
+Confirmed on the connected Supabase project:
+
+- All 11 new migration records are present.
+- All new tables have RLS enabled.
+- `anon` and `authenticated` have no table access to the new catalog data; the server role has the required access.
+- Privileged save routines are executable by `service_role`, not by `anon` or `authenticated`.
+- Transactional SQL checks passed for Arabic name normalization, preservation of `ة/ه` and `ى/ي`, stocktake numbering, receipt numbering, duplicate lines, zero stocktake quantity, decimal rejection, immutable stocktake year, item rename propagation, and trash restore.
+- Temporary test rows and counter increments were rolled back; the new catalog and operation tables remain empty.
+- The security advisor now reports only the two retained legacy tables (`public.items` and `public.movements`) as RLS-enabled without policies. The new tables have backend-only policies.
+- Performance advisor reports unused indexes while the new tables are empty; these indexes are retained intentionally.
+
+Authentication throttling and session lifecycle still need application-level integration tests before production.
+
 ## Verification still required
 
-Before production use, test the migrations against a disposable PostgreSQL/Supabase environment and verify:
+Before production use, verify:
 
 - Arabic normalization, including the agreed preservation of `ة/ه` and `ى/ي`.
 - Concurrent stocktake and receipt numbering.
