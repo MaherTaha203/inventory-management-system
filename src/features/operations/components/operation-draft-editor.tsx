@@ -14,6 +14,7 @@ import {
 } from "@/lib/local-drafts/draft-factory";
 import { getTodayISODate } from "@/lib/utils/date";
 import { formatISODate } from "@/lib/utils/date";
+import { validateOperationDraft } from "@/lib/validation/operation-draft";
 
 type Phase = "loading" | "choice" | "editing" | "error";
 
@@ -53,6 +54,8 @@ export default function OperationDraftEditor({
   const [payload, setPayload] = useState<OperationDraftPayload | null>(null);
   const [saveState, setSaveState] = useState<"saved" | "saving" | "failed">("saved");
   const [errorMessage, setErrorMessage] = useState("");
+  const [validationAttempted, setValidationAttempted] = useState(false);
+  const validation = payload ? validateOperationDraft(operation, payload) : null;
   const writeQueue = useRef<Promise<void>>(Promise.resolve());
   const initialized = useRef(false);
 
@@ -239,7 +242,9 @@ export default function OperationDraftEditor({
               inputMode="numeric"
               className="mt-2 w-full rounded-xl border border-[var(--border)] px-4 py-3 text-left"
               dir="ltr"
+              aria-invalid={validationAttempted && Boolean(validation?.errors.date)}
             />
+            {validationAttempted && validation?.errors.date && <p className="mt-2 text-xs text-red-700">{validation.errors.date}</p>}
             {isReceipt && (
               <div className="mt-4">
                 <label className="block text-sm font-semibold" htmlFor="supplier-name">اسم المورد (اختياري)</label>
@@ -248,7 +253,9 @@ export default function OperationDraftEditor({
                   value={payload.supplierName ?? ""}
                   onChange={(event) => updatePayload((current) => ({ ...current, supplierName: event.target.value }))}
                   className="mt-2 w-full rounded-xl border border-[var(--border)] px-4 py-3"
+                  aria-invalid={validationAttempted && Boolean(validation?.errors.supplierName)}
                 />
+                {validationAttempted && validation?.errors.supplierName && <p className="mt-2 text-xs text-red-700">{validation.errors.supplierName}</p>}
               </div>
             )}
           </div>
@@ -272,7 +279,9 @@ export default function OperationDraftEditor({
                       onChange={(event) => updateLine(line.id, { itemName: event.target.value })}
                       className="mt-2 w-full rounded-xl border border-[var(--border)] px-4 py-3"
                       placeholder="أدخل اسم الصنف"
+                      aria-invalid={validationAttempted && Boolean(validation?.errors.lines[line.id]?.itemName)}
                     />
+                    {validationAttempted && validation?.errors.lines[line.id]?.itemName && <p className="mt-2 text-xs text-red-700">{validation.errors.lines[line.id].itemName}</p>}
                   </label>
                   <label className="text-sm">
                     الكمية
@@ -283,7 +292,9 @@ export default function OperationDraftEditor({
                       dir="ltr"
                       className="mt-2 w-full rounded-xl border border-[var(--border)] px-4 py-3 text-left"
                       placeholder="0.00"
+                      aria-invalid={validationAttempted && Boolean(validation?.errors.lines[line.id]?.quantity)}
                     />
+                    {validationAttempted && validation?.errors.lines[line.id]?.quantity && <p className="mt-2 text-xs text-red-700">{validation.errors.lines[line.id].quantity}</p>}
                   </label>
                   <label className="text-sm sm:col-span-2">
                     الوحدة (اختيارية)
@@ -295,6 +306,7 @@ export default function OperationDraftEditor({
                     />
                   </label>
                 </div>
+                {validationAttempted && validation?.duplicateLineIds.includes(line.id) && <p className="mt-3 text-xs text-amber-700">تنبيه: هذا الصنف مكرر بنفس الوحدة في العملية. يمكنك الإبقاء عليه إذا كان مقصوداً.</p>}
               </article>
             ))}
           </div>
@@ -302,6 +314,14 @@ export default function OperationDraftEditor({
           <button onClick={addLine} className="w-full rounded-xl border border-dashed border-[var(--accent)] bg-white px-4 py-3 text-sm font-semibold text-[var(--accent)]">
             + إضافة صنف
           </button>
+          <button onClick={() => setValidationAttempted(true)} className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white">
+            التحقق من البيانات
+          </button>
+          {validationAttempted && validation && (
+            <p role="status" className={`rounded-xl p-4 text-sm leading-6 ${validation.valid ? "bg-emerald-50 text-emerald-800" : "bg-red-50 text-red-800"}`}>
+              {validation.valid ? "البيانات مستوفية لقواعد الإدخال. لم يتم حفظها كسجل مركزي." : "توجد بيانات تحتاج إلى تصحيح. راجع الحقول الموضحة أعلاه."}
+            </p>
+          )}
           <p className="rounded-xl bg-slate-100 p-4 text-xs leading-6 text-[var(--muted)]">
             هذه المرحلة تحفظ المسودة على الجهاز فقط. لم يتم بعد ربط زر الحفظ بالسجلات المركزية أو إنشاء رقم عملية.
           </p>
