@@ -155,3 +155,32 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ ok: true, id: data }, { status: 200 });
 }
+
+
+export async function DELETE(request: NextRequest) {
+  if (!hasSameOrigin(request)) {
+    return NextResponse.json({ error: "طلب غير مسموح." }, { status: 403 });
+  }
+  if (!(await hasValidSession(request))) {
+    return NextResponse.json({ error: "يلزم تسجيل الدخول." }, { status: 401 });
+  }
+
+  const body = await request.json().catch(() => null);
+  const parsed = z.object({ id: z.string().uuid() }).safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "رقم السند غير صحيح." }, { status: 400 });
+  }
+
+  const { data, error } = await getPrivilegedDatabaseClient().rpc(
+    "soft_delete_trash_entry",
+    { p_entry_type: "receipt", p_entry_id: parsed.data.id },
+  );
+  if (error) {
+    return NextResponse.json({ error: "تعذر نقل سند الاستلام إلى السلة." }, { status: 500 });
+  }
+  if (data !== true) {
+    return NextResponse.json({ error: "سند الاستلام غير موجود." }, { status: 404 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
