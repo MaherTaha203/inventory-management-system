@@ -37,9 +37,14 @@ export async function POST(request: NextRequest) {
     );
 
     if (!result.ok) {
+      const invalidPin = result.reason === "invalid_pin";
       return NextResponse.json(
-        { error: "تعذر إعداد رمز الدخول. قد يكون قد تم إعداده مسبقاً." },
-        { status: 409 },
+        {
+          error: invalidPin
+            ? "تأكد من تطابق رمز الدخول وتأكيده."
+            : "قد يكون رمز الدخول قد تم إعداده مسبقاً.",
+        },
+        { status: invalidPin ? 400 : 409 },
       );
     }
 
