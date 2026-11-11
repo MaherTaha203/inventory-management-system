@@ -6,7 +6,7 @@ const today = new Date(2026, 10, 11);
 function payload(overrides: Partial<OperationDraftPayload> = {}): OperationDraftPayload {
   return {
     date: "11/11/2026",
-    lines: [{ id: "line-1", itemId: null, itemName: "سكر", quantity: "2", unitId: null, unitName: "كغم" }],
+    lines: [{ id: "line-1", itemId: "00000000-0000-4000-8000-000000000001", itemName: "سكر", quantity: "2", unitId: "00000000-0000-4000-8000-000000000002", unitName: "كغم" }],
     ...overrides,
   };
 }
@@ -26,6 +26,22 @@ describe("validateOperationDraft", () => {
     const result = validateOperationDraft("stocktake", payload({ date: "31/02/2026", lines: [{ ...payload().lines[0], itemName: "  " }] }), today);
     expect(result.errors.date).toBeTruthy();
     expect(result.errors.lines["line-1"]?.itemName).toBeTruthy();
+  });
+
+  it("requires a selected catalog item and selected nonempty unit", () => {
+    const first = payload().lines[0];
+    const missingItem = validateOperationDraft(
+      "stocktake",
+      payload({ lines: [{ ...first, itemId: null }] }),
+      today,
+    );
+    const missingUnit = validateOperationDraft(
+      "stocktake",
+      payload({ lines: [{ ...first, unitId: null }] }),
+      today,
+    );
+    expect(missingItem.errors.lines["line-1"]?.itemName).toBeTruthy();
+    expect(missingUnit.errors.lines["line-1"]?.unitName).toBeTruthy();
   });
 
   it("allows an optional supplier name to remain empty", () => {
