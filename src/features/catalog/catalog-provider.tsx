@@ -107,7 +107,10 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    const task = window.setTimeout(() => {
+      void refresh();
+    }, 0);
+    return () => window.clearTimeout(task);
   }, [refresh]);
 
   const add = useCallback(
