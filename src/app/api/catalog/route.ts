@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { hasValidSession } from "@/lib/auth/guard";
 import { hasSameOrigin } from "@/lib/auth/http";
+import { publishInventoryChange } from "@/lib/realtime/publish-inventory-change";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   displayNameSchema,
