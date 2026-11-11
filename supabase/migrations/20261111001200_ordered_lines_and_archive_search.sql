@@ -215,9 +215,6 @@ $function$;
 revoke all on function public.save_receipt(uuid, date, uuid, jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.save_receipt(uuid, date, uuid, jsonb) to service_role;
 
-
-
-
 create or replace function public.search_stocktakes(
   p_query text default null,
   p_from date default null,
