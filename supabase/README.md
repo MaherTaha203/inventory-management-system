@@ -19,6 +19,7 @@ Apply the SQL files in timestamp order:
 5. `20261111000500_security_and_sessions.sql`
 6. `20261111000600_operations_and_validation.sql`
 7. `20261111000700_security_routines.sql`
+8. `20261111000800_empty_trash.sql`
 
 Do not skip a migration or apply them out of order. Review the complete SQL before applying it to the hosted project.
 
@@ -37,7 +38,7 @@ Do not skip a migration or apply them out of order. Review the complete SQL befo
 - Both routines save the operation and all its lines in one database transaction. A failed line rejects the whole save.
 - Stocktake numbering is derived from the operation date as `YY/NNN`. A saved operation cannot move to another year. Its number is never recycled after permanent deletion.
 - Receipt numbering is a single permanent sequence and is never recycled after permanent deletion.
-- Use `public.soft_delete_trash_entry(type, id)` for ordinary deletion, `public.restore_trash_entry(type, id)` for restoration, and `public.purge_trash_entry(type, id)` for immediate permanent deletion.
+- Use `public.soft_delete_trash_entry(type, id)` for ordinary deletion, `public.restore_trash_entry(type, id)` for restoration, `public.purge_trash_entry(type, id)` for immediate permanent deletion, and `public.empty_trash()` to empty the trash immediately.
 - `public.purge_expired_trash()` removes entries whose 30-day retention has elapsed.
 
 ## Scheduled purge
