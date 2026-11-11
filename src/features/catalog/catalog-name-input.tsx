@@ -19,7 +19,6 @@ export function CatalogNameInput({ kind, value, selectedId, onChange, label, pla
   const [focused, setFocused] = useState(false);
   const [message, setMessage] = useState("");
   const [ambiguousIds, setAmbiguousIds] = useState<string[]>([]);
-  const active = entries[kind].filter((entry) => !entry.isArchived);
   const suggestions = useMemo(() => searchCatalogNames(value, entries[kind]), [entries, kind, value]);
   const resolution = resolveCatalogName(value, entries[kind]);
 
