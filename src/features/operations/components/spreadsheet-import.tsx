@@ -189,6 +189,12 @@ export default function SpreadsheetImport({ operation }: { operation: OperationK
             } catch (cause) {
               if (cause instanceof CatalogApiError && cause.code === "NAME_MATCHES" && cause.matches.length === 1) {
                 item = cause.matches[0];
+              } else if (cause instanceof CatalogApiError && cause.code === "TRASH_SIMILAR") {
+                const confirmed = window.confirm(
+                  "يوجد اسم مشابه في سلة المحذوفات («" + row.itemName + "»). هل تريد إنشاء صنف جديد دون استعادة السجل القديم؟",
+                );
+                if (!confirmed) throw new Error("أُلغي استيراد الصفوف؛ لم تتم إضافة الصنف المشابه.");
+                item = await add("items", row.itemName, true);
               } else {
                 throw cause;
               }
