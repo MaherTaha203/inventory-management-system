@@ -91,6 +91,7 @@ export default function OperationDraftEditor({
                 quantity: string | number;
                 unit_id: string | null;
                 unit_name_snapshot: string | null;
+                line_position?: number;
               }>;
               receipt_lines?: Array<{
                 id: string;
@@ -99,6 +100,7 @@ export default function OperationDraftEditor({
                 quantity: string | number;
                 unit_id: string | null;
                 unit_name_snapshot: string | null;
+                line_position?: number;
               }>;
             };
           };
@@ -113,9 +115,10 @@ export default function OperationDraftEditor({
           if (!dateValue) throw new Error("تاريخ العملية غير متوفر.");
 
           const [year, month, day] = dateValue.split("-");
-          const lines = isReceipt
+          const lines = (isReceipt
             ? result.entry.receipt_lines ?? []
-            : result.entry.stocktake_lines ?? [];
+            : result.entry.stocktake_lines ?? []
+          ).sort((a, b) => (a.line_position ?? 0) - (b.line_position ?? 0));
 
           const loaded: OperationDraftPayload = {
             date: `${day}/${month}/${year}`,
