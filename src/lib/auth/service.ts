@@ -78,7 +78,6 @@ export async function initializePin(
   if (existingHash) return { ok: false, reason: "setup_required" };
 
   const pinHash = await hashPin(pin);
-  const supabase = createSupabaseAdminClient();
   const initialized = await callRpc<boolean>("initialize_shared_pin", {
     p_pin_hash: pinHash,
   });
@@ -156,7 +155,6 @@ export async function authenticatePin(
 export async function validateSession(sessionToken: string): Promise<boolean> {
   if (!isOpaqueToken(sessionToken)) return false;
 
-  const supabase = createSupabaseAdminClient();
   const valid = await callRpc<boolean>("validate_device_session", {
     p_session_token_hash: hashOpaqueToken(sessionToken),
   });
@@ -166,7 +164,6 @@ export async function validateSession(sessionToken: string): Promise<boolean> {
 export async function logoutSession(sessionToken: string): Promise<void> {
   if (!isOpaqueToken(sessionToken)) return;
 
-  const supabase = createSupabaseAdminClient();
   await callRpc<boolean>("revoke_device_session", {
     p_session_token_hash: hashOpaqueToken(sessionToken),
   });
@@ -194,7 +191,6 @@ export async function changePin(
   }
 
   const newHash = await hashPin(newPin);
-  const supabase = createSupabaseAdminClient();
   const changed = await callRpc<boolean>("change_shared_pin", {
     p_expected_pin_hash: expectedHash,
     p_new_pin_hash: newHash,
