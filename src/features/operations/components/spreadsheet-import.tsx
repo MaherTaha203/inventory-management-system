@@ -82,7 +82,7 @@ export default function SpreadsheetImport({ operation }: { operation: OperationK
         header: 1,
         raw: true,
         defval: "",
-        blankrows: false,
+        blankrows: true,
       });
       if (parsed.length < 2) throw new Error("الملف لا يحتوي على صفوف بيانات كافية.");
       if (parsed.length > 5001) throw new Error("الملف يتجاوز 5000 صف بيانات.");
