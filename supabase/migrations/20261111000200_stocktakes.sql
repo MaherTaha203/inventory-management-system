@@ -106,11 +106,11 @@ begin
     return new;
   end if;
 
-  insert into public.stocktake_counters (operation_year, last_sequence)
+  insert into public.stocktake_counters as counter (operation_year, last_sequence)
   values (v_year::smallint, 1)
   on conflict (operation_year)
   do update
-    set last_sequence = public.stocktake_counters.last_sequence + 1
+    set last_sequence = counter.last_sequence + 1
   returning last_sequence into v_sequence;
 
   new.operation_year := v_year::smallint;
