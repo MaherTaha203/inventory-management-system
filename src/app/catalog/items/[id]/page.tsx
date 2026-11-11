@@ -26,7 +26,6 @@ function formatDate(value?: string) {
 }
 
 export default function ItemHistoryPage({ params }: { params: Promise<{ id: string }> }) {
-  const [itemId, setItemId] = useState("");
   const [result, setResult] = useState<ItemHistoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,7 +34,6 @@ export default function ItemHistoryPage({ params }: { params: Promise<{ id: stri
     let active = true;
     void params.then(({ id }) => {
       if (!active) return;
-      setItemId(id);
       return fetch(`/api/catalog/items/${id}/history`, { cache: "no-store" })
         .then(async (response) => {
           const data = await response.json() as ItemHistoryResponse | { error?: string };
