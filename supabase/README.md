@@ -1,6 +1,6 @@
 # Database migrations
 
-These migrations define the new **Inventory & Receiving** data model. All 11 migrations are committed on `develop` and have been applied successfully to the connected Supabase project.
+These migrations define the new **Inventory & Receiving** data model. All 15 migrations are committed on `develop` and have been applied successfully to the connected Supabase project.
 
 ## Target project
 
@@ -71,16 +71,28 @@ Migration 6 installs a daily `pg_cron` job only if the extension is already enab
 
 Confirmed on the connected Supabase project:
 
-- All 11 new migration records are present.
+- All 15 new migration records are present.
 - All new tables have RLS enabled.
 - `anon` and `authenticated` have no table access to the new catalog data; the server role has the required access.
 - Privileged save routines are executable by `service_role`, not by `anon` or `authenticated`.
 - Transactional SQL checks passed for Arabic name normalization, preservation of `ة/ه` and `ى/ي`, stocktake numbering, receipt numbering, duplicate lines, zero stocktake quantity, decimal rejection, immutable stocktake year, item rename propagation, and trash restore.
 - Temporary test rows and counter increments were rolled back; the new catalog and operation tables remain empty.
+- Stocktake numbering is `YYYY-NNN` (for example `2026-001`), and the full-year format has been verified in the connected database.
 - The security advisor now reports only the two retained legacy tables (`public.items` and `public.movements`) as RLS-enabled without policies. The new tables have backend-only policies.
 - Performance advisor reports unused indexes while the new tables are empty; these indexes are retained intentionally.
 
 Authentication throttling and session lifecycle still need application-level integration tests before production.
+
+## Application features currently implemented
+
+- Catalog lists for items, suppliers, and measurement units, including conservative Arabic name matching and rename history.
+- Local IndexedDB drafts for stocktakes and receipts.
+- Atomic central save and edit routines for both operation types.
+- Paginated archives, trash and restore/purge actions, and separate item history.
+- Reports with shared column preferences, date filters, XLSX export, and browser print-to-PDF.
+- XLS/XLSX import with header and column mapping, row validation, preview, and explicit add-to-draft action.
+- Shared PIN authentication, device-session limits, idle lock, and a scheduled expired-trash cleanup endpoint.
+- Live invalidation broadcasts to refresh catalog, archive, reports, and trash views on active clients.
 
 ## Verification still required
 
