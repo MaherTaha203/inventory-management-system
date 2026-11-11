@@ -15,6 +15,11 @@ const modules = [
     href: "/catalog",
   },
   {
+    title: "الأرشيف",
+    description: "مراجعة عمليات الجرد وسندات الاستلام المحفوظة.",
+    href: "/archive",
+  },
+  {
     title: "التقارير",
     description: "عرض السجلات والبحث والتصفية والتصدير.",
     href: "/reports",
