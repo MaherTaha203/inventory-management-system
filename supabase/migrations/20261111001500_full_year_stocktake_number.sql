@@ -66,6 +66,4 @@ begin
 end;
 $function$;
 
-
-
 commit;
