@@ -11,6 +11,23 @@ import {
 } from "@/lib/auth/pin";
 
 type PinSettingsRow = { pin_hash: string | null };
+
+type RpcClient = {
+  rpc(
+    functionName: string,
+    args: Record<string, unknown>,
+  ): Promise<{ data: unknown; error: { message: string } | null }>;
+};
+
+async function callRpc<T>(
+  functionName: string,
+  args: Record<string, unknown>,
+): Promise<T> {
+  const client = createSupabaseAdminClient() as unknown as RpcClient;
+  const { data, error } = await client.rpc(functionName, args);
+  if (error) throw new Error(error.message);
+  return data as T;
+}
 type ThrottleRow = { blocked_until: string | null };
 
 type AttemptResult = {
@@ -62,12 +79,11 @@ export async function initializePin(
 
   const pinHash = await hashPin(pin);
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase.rpc("initialize_shared_pin", {
+  const initialized = await callRpc<boolean>("initialize_shared_pin", {
     p_pin_hash: pinHash,
   });
 
-  if (error) throw new Error("تعذر تهيئة رمز الدخول.");
-  if (data !== true) return { ok: false, reason: "setup_required" };
+  if (!initialized) return { ok: false, reason: "setup_required" };
 
   return authenticatePin(pin, deviceToken);
 }
@@ -106,17 +122,10 @@ export async function authenticatePin(
   }
 
   const pinIsValid = await verifyPin(pin, pinHash);
-  const { data: attemptData, error: attemptError } = await supabase.rpc(
-    "record_pin_attempt",
-    {
-      p_device_token_hash: deviceHash,
-      p_pin_valid: pinIsValid,
-    },
-  );
-
-  if (attemptError) throw new Error("تعذر تسجيل محاولة الدخول.");
-
-  const attempt = attemptData as AttemptResult;
+  const attempt = await callRpc<AttemptResult>("record_pin_attempt", {
+    p_device_token_hash: deviceHash,
+    p_pin_valid: pinIsValid,
+  });
   if (!attempt.allowed) {
     return {
       ok: false,
@@ -135,17 +144,10 @@ export async function authenticatePin(
   }
 
   const sessionToken = createOpaqueToken();
-  const { data: sessionData, error: sessionError } = await supabase.rpc(
-    "create_device_session",
-    {
-      p_device_token_hash: deviceHash,
-      p_session_token_hash: hashOpaqueToken(sessionToken),
-    },
-  );
-
-  if (sessionError) throw new Error("تعذر إنشاء جلسة الدخول.");
-
-  const session = sessionData as CreateSessionResult;
+  const session = await callRpc<CreateSessionResult>("create_device_session", {
+    p_device_token_hash: deviceHash,
+    p_session_token_hash: hashOpaqueToken(sessionToken),
+  });
   if (!session.created) return { ok: false, reason: "device_limit" };
 
   return { ok: true, sessionToken };
@@ -155,23 +157,19 @@ export async function validateSession(sessionToken: string): Promise<boolean> {
   if (!isOpaqueToken(sessionToken)) return false;
 
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase.rpc("validate_device_session", {
+  const valid = await callRpc<boolean>("validate_device_session", {
     p_session_token_hash: hashOpaqueToken(sessionToken),
   });
-
-  if (error) throw new Error("تعذر التحقق من جلسة الدخول.");
-  return data === true;
+  return valid === true;
 }
 
 export async function logoutSession(sessionToken: string): Promise<void> {
   if (!isOpaqueToken(sessionToken)) return;
 
   const supabase = createSupabaseAdminClient();
-  const { error } = await supabase.rpc("revoke_device_session", {
+  await callRpc<boolean>("revoke_device_session", {
     p_session_token_hash: hashOpaqueToken(sessionToken),
   });
-
-  if (error) throw new Error("تعذر إنهاء جلسة الدخول.");
 }
 
 export async function changePin(
@@ -197,12 +195,10 @@ export async function changePin(
 
   const newHash = await hashPin(newPin);
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase.rpc("change_shared_pin", {
+  const changed = await callRpc<boolean>("change_shared_pin", {
     p_expected_pin_hash: expectedHash,
     p_new_pin_hash: newHash,
     p_current_session_hash: hashOpaqueToken(sessionToken),
   });
-
-  if (error) throw new Error("تعذر تغيير رمز الدخول.");
-  return data === true;
+  return changed === true;
 }
