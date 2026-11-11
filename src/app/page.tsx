@@ -29,6 +29,11 @@ const modules = [
     description: "استعادة السجلات أو حذفها نهائياً.",
     href: "/trash",
   },
+  {
+    title: "الإعدادات",
+    description: "تغيير رمز الدخول المشترك.",
+    href: "/settings",
+  },
 ];
 
 export default function HomePage() {
