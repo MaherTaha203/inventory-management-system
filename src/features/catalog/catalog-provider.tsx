@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import type { CatalogEntry, CatalogKind } from "./catalog";
+import { useInventoryChanges } from "@/lib/realtime/use-inventory-changes";
 
 type CatalogApiEntry = {
   id: string;
@@ -105,6 +106,8 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     }
   }, []);
+
+  useInventoryChanges(() => { void refresh(); });
 
   useEffect(() => {
     const task = window.setTimeout(() => {
