@@ -69,7 +69,7 @@ async function readError(response: Response): Promise<CatalogApiError> {
 }
 
 async function loadKind(kind: CatalogKind): Promise<CatalogEntry[]> {
-  const response = await fetch(`/api/catalog?kind=${kind}`, {
+  const response = await fetch(`/api/catalog?kind=${kind}${kind === "units" ? "&includeInactive=true" : ""}`, {
     cache: "no-store",
   });
   if (!response.ok) throw await readError(response);
