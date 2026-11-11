@@ -65,6 +65,10 @@ async function getPinHash(): Promise<string | null> {
   return data?.pin_hash ?? null;
 }
 
+export async function isPinInitialized(): Promise<boolean> {
+  return (await getPinHash()) !== null;
+}
+
 export async function initializePin(
   pin: string,
   confirmation: string,
