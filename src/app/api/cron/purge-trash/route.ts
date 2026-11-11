@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { getPrivilegedDatabaseClient } from "@/lib/supabase/query-client";
+import { publishInventoryChange } from "@/lib/realtime/publish-inventory-change";
 
 export const runtime = "nodejs";
 
@@ -27,5 +28,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "تعذر حذف السجلات المنتهية." }, { status: 500 });
   }
 
+  await publishInventoryChange();
   return NextResponse.json({ ok: true, purged: data });
 }
