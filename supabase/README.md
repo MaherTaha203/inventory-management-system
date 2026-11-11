@@ -26,6 +26,7 @@ Apply the SQL files in timestamp order:
 12. `20261111001200_ordered_lines_and_archive_search.sql`
 13. `20261111001300_shared_report_preferences.sql`
 14. `20261111001400_item_history.sql`
+15. `20261111001500_full_year_stocktake_number.sql`
 
 Do not skip a migration or apply them out of order. Review the complete SQL before applying it to the hosted project.
 
