@@ -46,6 +46,7 @@ export default function ArchivePage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -98,6 +99,30 @@ export default function ArchivePage() {
     const task = window.setTimeout(() => void load(), 0);
     return () => window.clearTimeout(task);
   }, [load]);
+
+  async function moveToTrash(id: string) {
+    setBusyId(id);
+    setMessage("");
+    try {
+      const endpoint =
+        kind === "stocktake"
+          ? "/api/operations/stocktakes"
+          : "/api/operations/receipts";
+      const response = await fetch(endpoint, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(result.error ?? "تعذر نقل السجل إلى السلة.");
+      setMessage("تم نقل السجل إلى سلة المحذوفات.");
+      await load();
+    } catch (cause) {
+      setMessage(cause instanceof Error ? cause.message : "تعذر نقل السجل إلى السلة.");
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   function changeKind(next: OperationKind) {
     setKind(next);
@@ -234,9 +259,19 @@ export default function ArchivePage() {
                       </p>
                     )}
                   </div>
-                  <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs">
-                    {lines.length} سطور
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs">
+                      {lines.length} سطور
+                    </span>
+                    <button
+                      type="button"
+                      disabled={busyId === entry.id}
+                      onClick={() => void moveToTrash(entry.id)}
+                      className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 disabled:opacity-40"
+                    >
+                      {busyId === entry.id ? "جارٍ النقل…" : "نقل للسلة"}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-4 overflow-x-auto">
