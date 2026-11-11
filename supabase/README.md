@@ -41,7 +41,7 @@ Do not skip a migration or apply them out of order. Review the complete SQL befo
 
 ## Scheduled purge
 
-Migration 6 installs a daily `pg_cron` job only if the extension is already enabled and its scheduler function is available. If it is not enabled, configure a trusted server-side scheduled task (for example, a Vercel Cron route) to call `public.purge_expired_trash()` daily. Do not expose this routine to the browser.
+Migration 6 installs a daily `pg_cron` job only if the extension is already enabled and its scheduler function is available. The connected target project was checked and `pg_cron` is currently **not enabled**. Therefore, before production, configure a trusted server-side scheduled task (for example, a Vercel Cron route) to call `public.purge_expired_trash()` daily, or explicitly approve enabling and configuring `pg_cron`. Do not expose this routine to the browser.
 
 ## Verification still required
 
