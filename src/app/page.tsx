@@ -64,7 +64,7 @@ export default function HomePage() {
       </section>
 
       <footer className="mt-auto pt-12 text-xs text-[var(--muted)]">
-        إصدار تأسيسي — واجهة أولية قيد التطوير
+        نسخة تجريبية — تخضع لاختبارات القبول قبل الاستخدام الرسمي
       </footer>
     </main>
   );
