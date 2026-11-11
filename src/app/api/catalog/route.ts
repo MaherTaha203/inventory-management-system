@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
   const supabase = createSupabaseAdminClient();
   let query = supabase
     .from(tableFor(kind))
-    .select("id, name")
+    .select(kind === "units" ? "id, name, is_active" : "id, name")
     .order("name", { ascending: true })
     .limit(1000);
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     entries: (data ?? []).map((entry) => ({
       id: entry.id,
       name: entry.name,
-      isArchived: kind === "units" ? !("is_active" in entry) : false,
+      isArchived: kind === "units" ? entry.is_active === false : false,
     })),
   });
 }
@@ -205,7 +205,13 @@ export async function DELETE(request: NextRequest) {
 
   const { kind, id } = parsed.data;
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase.rpc("soft_delete_trash_entry", {
+  const rpcClient = supabase as unknown as {
+    rpc: (
+      functionName: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>;
+  };
+  const { data, error } = await rpcClient.rpc("soft_delete_trash_entry", {
     p_entry_type: kind === "items" ? "item" : "supplier",
     p_entry_id: id,
   });
