@@ -18,6 +18,7 @@ Apply the SQL files in timestamp order:
 4. `20261111000400_history_and_trash.sql`
 5. `20261111000500_security_and_sessions.sql`
 6. `20261111000600_operations_and_validation.sql`
+7. `20261111000700_security_routines.sql`
 
 Do not skip a migration or apply them out of order. Review the complete SQL before applying it to the hosted project.
 
