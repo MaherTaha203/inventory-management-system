@@ -1,4 +1,5 @@
 -- Atomic save routines, soft deletion, and final validation/index layer.
+-- SQLFluff validates PostgreSQL parsing and semantic rules; layout rules are configured separately.
 -- All privileged routines are executable only by the trusted service_role backend.
 
 begin;
