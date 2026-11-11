@@ -18,6 +18,73 @@ const requestSchema = z.object({
   ).min(1),
 });
 
+
+type StocktakeListRow = {
+  id: string;
+  operation_number: string;
+  operation_date: string;
+  stocktake_lines: Array<{
+    id: string;
+    item_name_snapshot: string;
+    quantity: number | string;
+    unit_name_snapshot: string | null;
+  }>;
+};
+
+export async function GET(request: NextRequest) {
+  if (!(await hasValidSession(request))) {
+    return NextResponse.json({ error: "يلزم تسجيل الدخول." }, { status: 401 });
+  }
+
+  const page = Math.max(
+    1,
+    Number.parseInt(request.nextUrl.searchParams.get("page") ?? "1", 10) || 1,
+  );
+  const pageSize = 20;
+  const search = request.nextUrl.searchParams.get("q")?.trim() ?? "";
+  const from = request.nextUrl.searchParams.get("from");
+  const to = request.nextUrl.searchParams.get("to");
+
+  if (from && !/^\d{4}-\d{2}-\d{2}$/.test(from)) {
+    return NextResponse.json({ error: "تاريخ البداية غير صحيح." }, { status: 400 });
+  }
+  if (to && !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+    return NextResponse.json({ error: "تاريخ النهاية غير صحيح." }, { status: 400 });
+  }
+  if (from && to && from > to) {
+    return NextResponse.json({ error: "تاريخ البداية يجب ألا يتجاوز تاريخ النهاية." }, { status: 400 });
+  }
+
+  let query = getPrivilegedDatabaseClient()
+    .from("stocktake_operations")
+    .select(
+      "id, operation_number, operation_date, stocktake_lines(id, item_name_snapshot, quantity, unit_name_snapshot)",
+      { count: "exact" },
+    )
+    .is("deleted_at", null)
+    .order("operation_date", { ascending: false })
+    .order("operation_sequence", { ascending: false })
+    .range((page - 1) * pageSize, page * pageSize - 1);
+
+  if (from) query = query.gte("operation_date", from);
+  if (to) query = query.lte("operation_date", to);
+  if (search) query = query.ilike("operation_number", `%${search.replace(/[\\%_]/g, "\\export async function POST(request: NextRequest) {")}%`);
+
+  const { data, error, count } = await query;
+  if (error) {
+    return NextResponse.json({ error: "تعذر تحميل أرشيف الجرد." }, { status: 500 });
+  }
+
+  const rows = (data ?? []) as StocktakeListRow[];
+  return NextResponse.json({
+    entries: rows,
+    page,
+    pageSize,
+    totalRows: count ?? 0,
+    totalPages: Math.ceil((count ?? 0) / pageSize),
+  });
+}
+
 export async function POST(request: NextRequest) {
   if (!hasSameOrigin(request)) {
     return NextResponse.json({ error: "طلب غير مسموح." }, { status: 403 });
