@@ -313,9 +313,19 @@ export default function OperationDraftEditor({
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-8 sm:px-6">
-      <nav className="mb-8 flex items-center justify-between">
+      <nav className="mb-8 flex items-center justify-between gap-3">
         <Link href="/" className="text-sm font-semibold text-[var(--accent)]">← الرئيسية</Link>
-        <span className="text-xs text-[var(--muted)]">نظام الجرد والاستلام</span>
+        <div className="flex items-center gap-3">
+          {!operationId && (
+            <Link
+              href={isReceipt ? "/receipts/import" : "/stocktakes/import"}
+              className="text-xs font-semibold text-[var(--accent)]"
+            >
+              استيراد Excel
+            </Link>
+          )}
+          <span className="text-xs text-[var(--muted)]">نظام الجرد والاستلام</span>
+        </div>
       </nav>
 
       <header className="mb-7">
