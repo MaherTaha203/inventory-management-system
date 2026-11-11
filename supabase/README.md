@@ -22,6 +22,7 @@ Apply the SQL files in timestamp order:
 8. `20261111000800_empty_trash.sql`
 9. `20261111000900_receipt_number_search.sql`
 10. `20261111001000_backend_rls_and_indexes.sql`
+11. `20261111001100_preserve_historical_references.sql`
 
 Do not skip a migration or apply them out of order. Review the complete SQL before applying it to the hosted project.
 
