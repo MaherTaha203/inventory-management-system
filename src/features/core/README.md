@@ -9,6 +9,7 @@ shared by stocktakes, receipts, catalog, reports and local drafts.
 - `src/lib/validation`: quantity, date and conservative name validation.
 - `src/lib/utils`: date formatting, pagination and typed operation results.
 - `src/lib/local-drafts`: per-browser IndexedDB draft repository.
+- `src/features/catalog`: catalog name matching, suggestions and session-only management UI.
 
 ## Local draft guarantees
 
@@ -34,3 +35,12 @@ shared by stocktakes, receipts, catalog, reports and local drafts.
 ## Verification
 
 Run `npm run lint`, `npm run typecheck` and `npm test`.
+
+
+## Catalog implementation boundary
+
+- Item, supplier and unit lists currently live in React memory for the active browser session only.
+- They are intentionally not persisted in IndexedDB and are not shared across devices.
+- Literal substring search is used for suggestions; archived entries are hidden from suggestions but remain in the catalog state.
+- Name resolution uses the conservative normalization rules and returns all matches when ambiguous. It never merges entries automatically.
+- The Supabase repository, schema, migrations and synchronization are intentionally not implemented yet. Connect Supabase before treating catalog entries as durable or shared data.
