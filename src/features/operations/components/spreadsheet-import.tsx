@@ -171,6 +171,11 @@ export default function SpreadsheetImport({ operation }: { operation: OperationK
     setBusy(true);
     setMessage("");
     try {
+      const existingDraft = await repository.get(operation);
+      if (existingDraft) {
+        throw new Error("توجد مسودة سابقة لهذه الوحدة. افتح صفحة الإدخال واختر استكمالها أو حذفها قبل الاستيراد.");
+      }
+
       const draftLines: DraftLine[] = [];
       const itemCache = new Map<string, { id: string; name: string }>();
       const unitCache = new Map<string, { id: string; name: string }>();
@@ -232,7 +237,7 @@ export default function SpreadsheetImport({ operation }: { operation: OperationK
       };
       const result = await repository.create(createOperationDraft(operation, payload));
       if (!result.created) {
-        throw new Error("توجد مسودة سابقة لهذه الوحدة. افتح صفحة الإدخال واختر استكمالها أو حذفها قبل الاستيراد.");
+        throw new Error("ظهرت مسودة جديدة أثناء الاستيراد. لم يتم استبدالها.");
       }
       router.push(operation === "stocktake" ? "/stocktakes" : "/receipts");
     } catch (cause) {
