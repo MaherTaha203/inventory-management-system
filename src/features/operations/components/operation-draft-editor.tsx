@@ -46,12 +46,16 @@ function localTimeLabel(value: string): string {
 
 export default function OperationDraftEditor({
   operation,
+  operationId,
 }: {
   operation: OperationKind;
+  operationId?: string;
 }) {
   const router = useRouter();
   const isReceipt = operation === "receipt";
-  const title = isReceipt ? "إدخال سند استلام" : "إدخال عملية جرد";
+  const title = operationId
+    ? isReceipt ? "تعديل سند استلام" : "تعديل عملية جرد"
+    : isReceipt ? "إدخال سند استلام" : "إدخال عملية جرد";
   const [phase, setPhase] = useState<Phase>("loading");
   const [existing, setExisting] = useState<LocalDraft<OperationDraftPayload> | null>(null);
   const [payload, setPayload] = useState<OperationDraftPayload | null>(null);
@@ -65,30 +69,108 @@ export default function OperationDraftEditor({
 
   useEffect(() => {
     let active = true;
-    repository
-      .get<OperationDraftPayload>(operation)
-      .then((draft) => {
-        if (!active) return;
-        if (draft) {
-          setExisting(draft);
+
+    if (operationId) {
+      const endpoint = isReceipt
+        ? `/api/operations/receipts/${operationId}`
+        : `/api/operations/stocktakes/${operationId}`;
+
+      void fetch(endpoint, { cache: "no-store" })
+        .then(async (response) => {
+          const result = (await response.json()) as {
+            error?: string;
+            entry?: {
+              operation_date?: string;
+              receipt_date?: string;
+              supplier_id?: string | null;
+              supplier_name_snapshot?: string | null;
+              stocktake_lines?: Array<{
+                id: string;
+                item_id: string | null;
+                item_name_snapshot: string;
+                quantity: string | number;
+                unit_id: string | null;
+                unit_name_snapshot: string | null;
+              }>;
+              receipt_lines?: Array<{
+                id: string;
+                item_id: string | null;
+                item_name_snapshot: string;
+                quantity: string | number;
+                unit_id: string | null;
+                unit_name_snapshot: string | null;
+              }>;
+            };
+          };
+
+          if (!response.ok || !result.entry) {
+            throw new Error(result.error ?? "تعذر تحميل العملية للتعديل.");
+          }
+
+          const dateValue = isReceipt
+            ? result.entry.receipt_date
+            : result.entry.operation_date;
+          if (!dateValue) throw new Error("تاريخ العملية غير متوفر.");
+
+          const [year, month, day] = dateValue.split("-");
+          const lines = isReceipt
+            ? result.entry.receipt_lines ?? []
+            : result.entry.stocktake_lines ?? [];
+
+          const loaded: OperationDraftPayload = {
+            date: `${day}/${month}/${year}`,
+            lines: lines.map((line) => ({
+              id: line.id,
+              itemId: line.item_id,
+              itemName: line.item_name_snapshot,
+              quantity: String(line.quantity),
+              unitId: line.unit_id,
+              unitName: line.unit_name_snapshot,
+            })),
+            ...(isReceipt
+              ? {
+                  supplierId: result.entry.supplier_id ?? null,
+                  supplierName: result.entry.supplier_name_snapshot ?? "",
+                }
+              : {}),
+          };
+
+          if (!active) return;
+          initialized.current = true;
+          setPayload(loaded);
+          setSaveState("saved");
+          setPhase("editing");
+        })
+        .catch((error: unknown) => {
+          if (!active) return;
+          setErrorMessage(
+            error instanceof Error ? error.message : "تعذر تحميل العملية.",
+          );
+          setPhase("error");
+        });
+    } else {
+      repository
+        .get<OperationDraftPayload>(operation)
+        .then((draft) => {
+          if (!active) return;
+          if (draft) setExisting(draft);
           setPhase("choice");
-        } else {
-          setPhase("choice");
-        }
-      })
-      .catch((error: unknown) => {
-        if (!active) return;
-        setErrorMessage(
-          error instanceof LocalDraftStorageError
-            ? error.message
-            : "تعذر الوصول إلى المسودة المحلية في هذا المتصفح.",
-        );
-        setPhase("error");
-      });
+        })
+        .catch((error: unknown) => {
+          if (!active) return;
+          setErrorMessage(
+            error instanceof LocalDraftStorageError
+              ? error.message
+              : "تعذر الوصول إلى المسودة المحلية في هذا المتصفح.",
+          );
+          setPhase("error");
+        });
+    }
+
     return () => {
       active = false;
     };
-  }, [operation]);
+  }, [isReceipt, operation, operationId]);
 
   const beginNew = useCallback(async () => {
     const fresh = createOperationDraft<OperationDraftPayload>(operation, {
@@ -133,7 +215,7 @@ export default function OperationDraftEditor({
   }, [beginNew, operation]);
 
   useEffect(() => {
-    if (phase !== "editing" || !payload || !initialized.current) return;
+    if (operationId || phase !== "editing" || !payload || !initialized.current) return;
     const snapshot = createOperationDraft(operation, payload);
     setSaveState("saving");
     writeQueue.current = writeQueue.current
@@ -141,7 +223,7 @@ export default function OperationDraftEditor({
       .then(() => repository.save(snapshot))
       .then(() => setSaveState("saved"))
       .catch(() => setSaveState("failed"));
-  }, [operation, payload, phase]);
+  }, [operation, operationId, payload, phase]);
 
   function updatePayload(updater: (current: OperationDraftPayload) => OperationDraftPayload) {
     setPayload((current) => (current ? updater(current) : current));
@@ -175,15 +257,17 @@ export default function OperationDraftEditor({
     setErrorMessage("");
 
     try {
-      await writeQueue.current;
-      await repository.save(createOperationDraft(operation, payload));
+      if (!operationId) {
+        await writeQueue.current;
+        await repository.save(createOperationDraft(operation, payload));
+      }
 
       const endpoint =
         operation === "stocktake"
           ? "/api/operations/stocktakes"
           : "/api/operations/receipts";
       const body = {
-        operationId: null,
+        operationId: operationId ?? null,
         date: payload.date,
         ...(isReceipt ? { supplierId: payload.supplierId ?? null } : {}),
         lines: payload.lines.map((line) => ({
@@ -208,10 +292,12 @@ export default function OperationDraftEditor({
         return;
       }
 
-      try {
-        await repository.removeAfterCentralSave(operation);
-      } catch {
-        setErrorMessage("تم حفظ العملية مركزياً، لكن تعذر حذف المسودة المحلية.");
+      if (!operationId) {
+        try {
+          await repository.removeAfterCentralSave(operation);
+        } catch {
+          setErrorMessage("تم حفظ العملية مركزياً، لكن تعذر حذف المسودة المحلية.");
+        }
       }
 
       router.push(`/archive?kind=${operation}`);
@@ -392,10 +478,14 @@ export default function OperationDraftEditor({
             disabled={submitting || saveState !== "saved"}
             className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? "جارٍ حفظ العملية…" : "حفظ العملية"}
+            {submitting
+              ? "جارٍ الحفظ…"
+              : operationId
+                ? "حفظ التعديلات"
+                : "حفظ العملية"}
           </button>
           <p className="rounded-xl bg-slate-100 p-4 text-xs leading-6 text-[var(--muted)]">
-            عند نجاح الحفظ يُنشأ رقم العملية في قاعدة البيانات وتُحذف المسودة المحلية. إذا فشل الحفظ تبقى المسودة كما هي.
+عند نجاح الحفظ تُحدّث بيانات العملية في قاعدة البيانات. وإذا فشل الحفظ تبقى البيانات كما هي.
           </p>
         </section>
       )}
