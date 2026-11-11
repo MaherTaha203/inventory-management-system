@@ -5,6 +5,7 @@ import { hasSameOrigin } from "@/lib/auth/http";
 import { operationDateSchema, parseDisplayDate } from "@/lib/validation/date";
 import { quantityTextSchema } from "@/lib/validation/quantity";
 import { getPrivilegedDatabaseClient } from "@/lib/supabase/query-client";
+import { publishInventoryChange } from "@/lib/realtime/publish-inventory-change";
 
 const requestSchema = z.object({
   operationId: z.string().uuid().nullable().optional(),
@@ -156,6 +157,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  await publishInventoryChange();
   return NextResponse.json({ ok: true, id: data }, { status: 200 });
 }
 
@@ -185,5 +187,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "سند الاستلام غير موجود." }, { status: 404 });
   }
 
+  await publishInventoryChange();
   return NextResponse.json({ ok: true });
 }
