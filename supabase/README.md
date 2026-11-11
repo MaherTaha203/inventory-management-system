@@ -43,7 +43,7 @@ Do not skip a migration or apply them out of order. Review the complete SQL befo
 - Call `public.save_stocktake(operation_id, operation_date, lines)` for both creating and editing a stocktake. Pass `null` for `operation_id` when creating. The line array contains `item_id`, `quantity`, and optional `unit_id`.
 - Call `public.save_receipt(operation_id, receipt_date, supplier_id, lines)` for both creating and editing a receipt. Pass `null` for `operation_id` when creating and `null` for an optional supplier.
 - Both routines save the operation and all its lines in one database transaction. A failed line rejects the whole save.
-- Stocktake numbering is derived from the operation date as `YY/NNN`. A saved operation cannot move to another year. Its number is never recycled after permanent deletion.
+- Stocktake numbering is derived from the operation date as `YYYY-NNN` (for example `2026-001`). A saved operation cannot move to another year. Its number is never recycled after permanent deletion.
 - Receipt numbering is a single permanent sequence and is never recycled after permanent deletion.
 - Use `public.soft_delete_trash_entry(type, id)` for ordinary deletion, `public.restore_trash_entry(type, id)` for restoration, `public.purge_trash_entry(type, id)` for immediate permanent deletion, and `public.empty_trash()` to empty the trash immediately.
 - `public.purge_expired_trash()` removes entries whose 30-day retention has elapsed.
@@ -94,18 +94,17 @@ Authentication throttling and session lifecycle still need application-level int
 - Shared PIN authentication, device-session limits, idle lock, and a scheduled expired-trash cleanup endpoint.
 - Live invalidation broadcasts to refresh catalog, archive, reports, and trash views on active clients.
 
-## Verification still required
+## Remaining production verification
 
-Before production use, verify:
+The connected database migrations, RLS settings, numbering, normalization, save routines, line ordering, search routines, rename propagation, item history, and trash restoration have been checked directly.
 
-- Arabic normalization, including the agreed preservation of `ة/ه` and `ى/ي`.
-- Concurrent stocktake and receipt numbering.
-- Rejection of invalid dates and quantities with more than two decimals.
-- Rejection of an attempt to change a saved stocktake year.
-- Atomic rollback when any operation line is invalid.
-- Rename propagation and name-history recording.
-- Restore, permanent deletion, foreign-key behavior, and the 30-day purge.
-- Direct Data API access is denied to `anon` and `authenticated`.
-- Only the server-side service role can call privileged routines.
+Before production use, still complete:
 
-A successful Git commit is not evidence that the SQL has been applied or that these database tests have passed.
+- End-to-end login tests covering throttling, three-device limit, one-tab rule, ten-minute idle lock, and PIN change across browsers.
+- Live Broadcast delivery tests with two or more signed-in browser sessions.
+- XLS/XLSX import tests using representative files, including formulas with cached values, blank rows, duplicates, and invalid quantities.
+- Browser checks for XLSX export and Arabic print-to-PDF output on desktop and mobile.
+- Verify the daily Vercel Cron invocation after setting `CRON_SECRET` in the deployment environment.
+- Confirm that the server environment contains the Supabase URL, publishable key, and server-only secret key.
+
+The application code is on `develop`; deployment and real-device acceptance testing have not yet been completed.
