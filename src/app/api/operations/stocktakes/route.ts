@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
 
   if (from) query = query.gte("operation_date", from);
   if (to) query = query.lte("operation_date", to);
-  if (search) query = query.ilike("operation_number", `%${search.replace(/[\\%_]/g, "\\export async function POST(request: NextRequest) {")}%`);
+  if (search) query = query.ilike("operation_number", "%" + search.replace(/[\\%_]/g, "\\$&") + "%");
 
   const { data, error, count } = await query;
   if (error) {
