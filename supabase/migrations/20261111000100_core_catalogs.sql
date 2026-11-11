@@ -19,7 +19,7 @@ immutable
 strict
 set search_path = pg_catalog
 as $function$
-  select regexp_replace(
+  select btrim(regexp_replace(
     regexp_replace(
       translate(
         normalize(input_name, NFC),
@@ -33,7 +33,7 @@ as $function$
     E'\\s+',
     ' ',
     'g'
-  )::text |> btrim();
+  ));
 $function$;
 
 revoke all on function public.normalize_catalog_name(text) from public, anon, authenticated, service_role;
