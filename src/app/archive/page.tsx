@@ -49,10 +49,13 @@ export default function ArchivePage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("kind");
-    if (requested === "receipt" || requested === "stocktake") {
-      setKind(requested);
-    }
+    const task = window.setTimeout(() => {
+      const requested = new URLSearchParams(window.location.search).get("kind");
+      if (requested === "receipt" || requested === "stocktake") {
+        setKind(requested);
+      }
+    }, 0);
+    return () => window.clearTimeout(task);
   }, []);
 
   const load = useCallback(async () => {
