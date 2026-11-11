@@ -7,7 +7,7 @@ import { quantityTextSchema } from "./quantity";
 export type DraftValidationErrors = {
   date?: string;
   supplierName?: string;
-  lines: Record<string, { itemName?: string; quantity?: string }>;
+  lines: Record<string, { itemName?: string; quantity?: string; unitName?: string }>;
 };
 
 export interface DraftValidationResult {
@@ -33,6 +33,8 @@ export function validateOperationDraft(
     const supplierResult = displayNameSchema.safeParse(payload.supplierName);
     if (!supplierResult.success) {
       errors.supplierName = supplierResult.error.issues[0]?.message ?? "اسم المورد غير صحيح.";
+    } else if (!payload.supplierId) {
+      errors.supplierName = "اختر المورد من القائمة أو أضفه أولاً.";
     }
   }
 
@@ -40,10 +42,16 @@ export function validateOperationDraft(
   const duplicateLineIds = new Set<string>();
 
   for (const line of payload.lines) {
-    const lineErrors: { itemName?: string; quantity?: string } = {};
+    const lineErrors: { itemName?: string; quantity?: string; unitName?: string } = {};
     const itemResult = displayNameSchema.safeParse(line.itemName);
     if (!itemResult.success) {
       lineErrors.itemName = itemResult.error.issues[0]?.message ?? "اسم الصنف مطلوب.";
+    } else if (!line.itemId) {
+      lineErrors.itemName = "اختر الصنف من القائمة أو أضفه أولاً.";
+    }
+
+    if (line.unitName?.trim() && !line.unitId) {
+      lineErrors.unitName = "اختر الوحدة من القائمة أو أضفها أولاً.";
     }
 
     const quantityResult = quantityTextSchema({ allowZero: operation === "stocktake" }).safeParse(line.quantity);
