@@ -120,6 +120,7 @@ declare
   v_operation_id uuid;
   v_supplier_name text;
   v_line jsonb;
+  v_position integer;
   v_item_id uuid;
   v_unit_id uuid;
   v_quantity numeric;
