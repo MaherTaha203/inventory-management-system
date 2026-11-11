@@ -1,0 +1,39 @@
+name: Repository Checks
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  structure:
+    name: Check repository baseline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Verify baseline documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f README.md
+          grep -q "نظام الجرد والاستلام" README.md
+          echo "Repository baseline checks passed."
+
+      - name: Report current scaffold
+        shell: bash
+        run: |
+          echo "This workflow intentionally checks repository scaffolding only."
+          echo "It does not create, modify, or execute application or database files."

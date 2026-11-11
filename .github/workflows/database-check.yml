@@ -1,0 +1,66 @@
+name: Database SQL Checks
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - "supabase/**/*.sql"
+      - "database/**/*.sql"
+      - ".github/workflows/database-check.yml"
+  pull_request:
+    branches: [develop, main]
+    paths:
+      - "supabase/**/*.sql"
+      - "database/**/*.sql"
+      - ".github/workflows/database-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sql-lint:
+    name: Lint SQL files (no database connection)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Locate SQL files
+        id: sql
+        shell: bash
+        run: |
+          mapfile -t files < <(find supabase database -type f -name '*.sql' 2>/dev/null | sort || true)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+            echo "No SQL files found; validation is safely skipped."
+          else
+            printf '%s\n' "${files[@]}" > /tmp/sql-files.txt
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        if: steps.sql.outputs.has_files == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install SQLFluff
+        if: steps.sql.outputs.has_files == 'true'
+        run: python -m pip install --disable-pip-version-check sqlfluff
+
+      - name: Lint PostgreSQL SQL
+        if: steps.sql.outputs.has_files == 'true'
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/sql-files.txt
+          sqlfluff lint --dialect postgres "${files[@]}"
+
+      - name: Confirm non-execution policy
+        run: |
+          echo "This workflow only performs static SQL linting."
+          echo "It does not connect to Supabase or execute migrations."

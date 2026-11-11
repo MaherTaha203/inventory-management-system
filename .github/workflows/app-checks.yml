@@ -1,0 +1,61 @@
+name: Application Checks
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "tsconfig.json"
+      - "next.config.ts"
+      - "postcss.config.mjs"
+      - "eslint.config.mjs"
+      - "vitest.config.ts"
+      - ".github/workflows/app-checks.yml"
+  pull_request:
+    branches: [develop, main]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "tsconfig.json"
+      - "next.config.ts"
+      - "postcss.config.mjs"
+      - "eslint.config.mjs"
+      - "vitest.config.ts"
+      - ".github/workflows/app-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint, typecheck, test and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
