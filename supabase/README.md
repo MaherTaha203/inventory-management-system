@@ -59,7 +59,13 @@ Configure these values in the trusted server environment (local `.env.local` and
 - `INITIAL_SETUP_SECRET` — random secret of at least 32 characters used only for first-run PIN initialization.
 - `CRON_SECRET` — random secret of at least 32 characters used to authorize the daily Vercel cleanup task.
 
-Do not send or commit the secret key or setup secret.
+ولإنشاء السرّين محلياً، نفّذ الأمر التالي مرتين بقيمتين مختلفتين، ثم ضع كل قيمة في متغيرها:
+
+```bash
+openssl rand -hex 32
+```
+
+لا ترسل هذه القيم في المحادثة ولا ترفعها إلى Git.
 
 ## Scheduled purge
 
