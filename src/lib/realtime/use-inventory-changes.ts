@@ -5,7 +5,10 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function useInventoryChanges(onChange: () => void) {
   const callback = useRef(onChange);
-  callback.current = onChange;
+
+  useEffect(() => {
+    callback.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     let client: ReturnType<typeof createSupabaseBrowserClient>;
