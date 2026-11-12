@@ -276,6 +276,7 @@ export default function ReportsPage() {
 
       {loading ? <p role="status" className="rounded-xl border border-[var(--border)] bg-white p-5 text-sm text-[var(--muted)]">جارٍ تحميل التقرير…</p> :
         rows.length === 0 ? <p className="rounded-xl border border-[var(--border)] bg-white p-5 text-sm text-[var(--muted)]">لا توجد نتائج مطابقة لمعايير البحث.</p> :
+        <>
         <div className="report-mobile-cards">
           {rows.map((row, index) => {
             const visibleColumns = definitions[kind].filter((column) => columns[kind].includes(column.key));
@@ -299,6 +300,7 @@ export default function ReportsPage() {
             <tbody className="divide-y divide-[var(--border)]">{rows.map((row,index) => <tr key={index}>{definitions[kind].filter((column) => columns[kind].includes(column.key)).map((column) => <td key={column.key} className="whitespace-nowrap px-4 py-3">{row[column.key]}</td>)}</tr>)}</tbody>
           </table>
         </div>
+        </>
       }
 
       {totalPages > 1 && <div className="mt-5 flex items-center justify-between">
