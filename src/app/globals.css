@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
-:root{color-scheme:light;--background:#f5f8f6;--foreground:#20332d;--surface:#fff;--border:#e2eae5;--muted:#66766f;--accent:#176c50;--blue:#245d91;--shadow-soft:0 10px 28px rgba(30,65,50,.07)}
+:root{color-scheme:light;--background:#f1f7f2;--foreground:#18362b;--surface:#ffffff;--border:#dce9df;--muted:#63776b;--accent:#176c45;--accent-strong:#0d5636;--accent-soft:#e5f2e8;--blue:#245d91;--shadow-soft:0 10px 28px rgba(20,72,44,.08);--shadow-card:0 4px 14px rgba(20,72,44,.055);--radius-card:18px;--focus-ring:0 0 0 3px rgba(31,132,79,.16)}
 *{box-sizing:border-box}html,body{min-height:100%}html{background:var(--background)}
 body{min-height:100vh;margin:0;background:radial-gradient(ellipse at 88% 0%,rgba(211,235,221,.38),transparent 34rem),var(--background);color:var(--foreground);font-family:"Tajawal","Noto Sans Arabic",Tahoma,Arial,sans-serif}
 button,input,select,textarea{font:inherit}
@@ -332,4 +332,79 @@ button,input,select,textarea{font:inherit}
   .mobile-app-content .dashboard-shell { padding-inline: 11px; }
   .mobile-app-content .module-card strong { font-size: 11px; }
   .report-mobile-card dl { grid-template-columns: minmax(0,1fr); }
+}
+
+
+/* Unified visual system — desktop and mobile */
+body{background:var(--background);color:var(--foreground)}
+::selection{background:#cce8d4;color:#123b27}
+a{ -webkit-tap-highlight-color:transparent }
+button{cursor:pointer}
+button:disabled{cursor:not-allowed}
+input,select,textarea{color:var(--foreground)}
+input::placeholder,textarea::placeholder{color:#8a9a90;opacity:1}
+:where(button,a,input,select,textarea,[role=button]):focus-visible{outline:3px solid rgba(34,132,78,.45);outline-offset:2px}
+main[class$="-page"]{width:min(100% - 32px,1080px);padding-top:28px;padding-bottom:36px}
+main[class$="-page"]>nav{display:flex;align-items:center;gap:12px;min-height:38px;margin-bottom:24px!important}
+main[class$="-page"]>nav a{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:7px 12px;border:1px solid var(--border);border-radius:11px;background:#fff;color:var(--accent);font-weight:700;text-decoration:none;box-shadow:0 2px 7px rgba(20,72,44,.035)}
+main[class$="-page"]>header{margin-bottom:22px!important}
+main[class$="-page"]>header h1{color:var(--foreground);font-size:clamp(23px,3vw,30px);font-weight:800;letter-spacing:-.35px;line-height:1.25}
+main[class$="-page"]>header p{max-width:720px;color:var(--muted);font-size:14px;line-height:1.8}
+main[class$="-page"] section.rounded-2xl,
+main[class$="-page"] form.rounded-2xl,
+main[class$="-page"] article,
+main[class$="-page"] .report-mobile-card,
+main[class$="-page"] .import-mobile-card{border-color:var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-card)}
+main[class$="-page"] input:not([type=checkbox]):not([type=radio]):not([type=file]),
+main[class$="-page"] select,
+main[class$="-page"] textarea{min-height:46px;border:1px solid #d6e4da;border-radius:12px;background:#fbfdfb;padding:10px 13px;color:var(--foreground);transition:border-color .16s,box-shadow .16s,background .16s}
+main[class$="-page"] input:focus,
+main[class$="-page"] select:focus,
+main[class$="-page"] textarea:focus{border-color:#26915b;outline:none;box-shadow:var(--focus-ring);background:#fff}
+main[class$="-page"] button{min-height:42px;border-radius:11px;font-weight:700;transition:transform .14s ease,filter .14s ease,box-shadow .14s ease}
+main[class$="-page"] button:not(:disabled):active{transform:translateY(1px)}
+main[class$="-page"] button:disabled{opacity:.48}
+main[class$="-page"] table{width:100%;border-collapse:separate;border-spacing:0}
+main[class$="-page"] th{background:#f1f7f2;color:#385647;font-size:12px;font-weight:800}
+main[class$="-page"] th,main[class$="-page"] td{padding:12px 13px;border-bottom:1px solid var(--border);text-align:right;vertical-align:middle}
+main[class$="-page"] tr:last-child td{border-bottom:0}
+main[class$="-page"] [role=alert]{border:1px solid #f2caca;background:#fff5f5;color:#9d3030}
+main[class$="-page"] [role=status]{border:1px solid var(--border);background:#f5faf6;color:#315642}
+main[class$="-page"] label{color:#344f40;font-weight:700}
+main[class$="-page"] .text-\[var\(--muted\)\]{color:var(--muted)}
+.mobile-app-nav{background:#0c5b39!important;border-top:1px solid rgba(255,255,255,.12);box-shadow:0 -7px 22px rgba(12,67,39,.13)}
+.mobile-app-nav a{color:rgba(255,255,255,.78);border-radius:11px;transition:background .15s,color .15s}
+.mobile-app-nav a[aria-current=page]{background:rgba(255,255,255,.16);color:#fff;font-weight:800}
+.mobile-app-nav svg{width:21px;height:21px}
+@media(max-width:767px){
+ main[class$="-page"]{width:100%;padding:16px 14px 22px}
+ main[class$="-page"]>nav{margin-bottom:18px!important}
+ main[class$="-page"]>header{margin-bottom:17px!important}
+ main[class$="-page"]>header h1{font-size:23px}
+ main[class$="-page"]>header p{font-size:12px;line-height:1.65}
+ main[class$="-page"] section.rounded-2xl,
+ main[class$="-page"] form.rounded-2xl{border-radius:16px}
+ main[class$="-page"] th,main[class$="-page"] td{padding:10px;font-size:12px}
+ .mobile-app-content:has(.dashboard-shell){overflow:hidden}
+ .mobile-app-content .dashboard-shell{height:100%;min-height:0;overflow:hidden;justify-content:center;padding:12px 14px 16px;gap:0}
+ .mobile-app-content .dashboard-intro{padding:0 0 12px}
+ .mobile-app-content .dashboard-intro h1{font-size:22px}
+ .mobile-app-content .primary-actions{gap:9px}
+ .mobile-app-content .primary-card{min-height:clamp(88px,15svh,122px);border-radius:15px}
+ .mobile-app-content .primary-card-title{font-size:20px}
+ .mobile-app-content .secondary-section{margin-top:12px}
+ .mobile-app-content .section-title{margin-bottom:7px}
+ .mobile-app-content .secondary-grid{gap:7px}
+ .mobile-app-content .module-card{min-height:clamp(62px,10.5svh,82px);padding:6px;border-radius:12px;gap:4px}
+ .mobile-app-content .module-icon{width:30px;height:30px;border-radius:9px}
+ .mobile-app-content .module-icon svg{width:17px;height:17px}
+ .mobile-app-content .module-card strong{font-size:12px}
+}
+@media(max-height:680px) and (max-width:767px){
+ .mobile-app-content .dashboard-shell{padding-block:7px}
+ .mobile-app-content .dashboard-intro{padding-bottom:7px}
+ .mobile-app-content .primary-card{min-height:82px}
+ .mobile-app-content .secondary-section{margin-top:8px}
+ .mobile-app-content .module-card{min-height:58px}
+ .mobile-app-content .module-icon{width:26px;height:26px}
 }
