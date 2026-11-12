@@ -203,9 +203,10 @@ button,input,select,textarea{font:inherit}
 /* Page-by-page mobile layouts: retain the current visual language and workflows */
 @media (max-width: 767px) {
   /* Home is the only screen that must not scroll vertically. */
-  .mobile-app-content:has(.dashboard-shell) { overflow: hidden; }
+  .mobile-app-content:has(.dashboard-shell) { display: flex; flex-direction: column; overflow: hidden; }
   .mobile-app-content .dashboard-shell {
-    height: 100%;
+    flex: 1 1 auto;
+    height: auto;
     min-height: 0;
     padding: 16px 15px 14px;
     justify-content: center;
