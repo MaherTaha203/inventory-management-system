@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const modules = [
   { title: "القوائم", href: "/catalog", icon: "list", tone: "mint" },
   { title: "الأرشيف", href: "/archive", icon: "archive", tone: "blue" },
@@ -24,7 +26,7 @@ export default function HomePage() {
     <main className="dashboard-shell">
       <section className="dashboard-intro"><h1>لوحة التحكم</h1></section>
       <section className="primary-actions" aria-label="العمليات الرئيسية">
-        <a className="primary-card primary-stocktake" href="/stocktakes">
+        <Link className="primary-card primary-stocktake" href="/stocktakes">
           <span className="primary-card-icon"><ModuleIcon name="clipboard" /></span>
           <span className="primary-card-title">الجرد</span>
         </a>
@@ -37,7 +39,7 @@ export default function HomePage() {
         <h2 className="section-title">الوحدات</h2>
         <div className="secondary-grid">
           {modules.map((module) => (
-            <a className="module-card" href={module.href} key={module.href}>
+            <Link className="module-card" href={module.href} key={module.href}>
               <span className={`module-icon tone-${module.tone}`}><ModuleIcon name={module.icon} /></span>
               <strong>{module.title}</strong>
             </a>
