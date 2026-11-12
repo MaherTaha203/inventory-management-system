@@ -137,7 +137,7 @@ export default function ArchivePage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-8 sm:px-6">
+    <main className="archive-page mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-8 sm:px-6">
       <nav className="mb-8 flex items-center justify-between">
         <Link href="/" className="text-sm font-semibold text-[var(--accent)]">
           ← الرئيسية
