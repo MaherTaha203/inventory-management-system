@@ -115,8 +115,11 @@ export function AuthGate({ children }: { children: ReactNode }) {
     let pingInProgress = false;
 
     const lockForInactivity = () => {
-      setMessage("تم قفل النظام بسبب عدم النشاط. أدخل رمز الدخول للمتابعة.");
-      setPhase("login");
+      // Revoke the server-side session and clear its cookie when inactivity locks the app.
+      void fetch("/api/auth/logout", { method: "POST" }).finally(() => {
+        setMessage("تم قفل النظام بسبب عدم النشاط. أدخل رمز الدخول للمتابعة.");
+        setPhase("login");
+      });
     };
 
     const scheduleIdleLock = () => {
