@@ -1,5 +1,5 @@
-import OperationDraftEditor from "@/features/operations/components/operation-draft-editor";
+import OperationList from "@/features/operations/components/operation-list";
 
 export default function ReceiptsPage() {
-  return <OperationDraftEditor operation="receipt" />;
+  return <OperationList kind="receipt" />;
 }
