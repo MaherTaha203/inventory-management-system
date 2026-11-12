@@ -1,5 +1,5 @@
-import OperationDraftEditor from "@/features/operations/components/operation-draft-editor";
+import OperationList from "@/features/operations/components/operation-list";
 
 export default function StocktakesPage() {
-  return <OperationDraftEditor operation="stocktake" />;
+  return <OperationList kind="stocktake" />;
 }

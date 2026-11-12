@@ -303,7 +303,7 @@ export default function OperationDraftEditor({
         }
       }
 
-      router.push(`/archive?kind=${operation}`);
+      router.push(operation === "stocktake" ? "/stocktakes" : "/receipts");
     } catch {
       setErrorMessage("تعذر الاتصال أو حفظ العملية. بقيت المسودة المحلية كما هي.");
     } finally {

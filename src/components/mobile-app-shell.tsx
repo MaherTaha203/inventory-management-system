@@ -41,6 +41,13 @@ export function MobileAppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="mobile-app-shell">
+      <header className="mobile-app-header">
+        <Link href="/" aria-label="العودة إلى الرئيسية"><span className="mobile-app-header-mark">▦</span><span>نظام إدارة المخزون</span></Link>
+        <div className="mobile-app-header-actions">
+          <Link href="/archive" aria-label="الأرشيف">▤</Link>
+          <Link href="/settings" aria-label="الإعدادات">⚙</Link>
+        </div>
+      </header>
       <div className="mobile-app-content">{children}</div>
       <nav className="mobile-app-nav" aria-label="التنقل الرئيسي">
         {tabs.map((tab) => {
