@@ -252,7 +252,7 @@ export default function SpreadsheetImport({ operation }: { operation: OperationK
   const selectedCount = rows.filter((row) => row.checked && !row.error).length;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-8 sm:px-6">
+    <main className="spreadsheet-import-page mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-8 sm:px-6">
       <nav className="mb-8">
         <Link href={operation === "stocktake" ? "/stocktakes" : "/receipts"} className="text-sm font-semibold text-[var(--accent)]">← العودة للإدخال</Link>
       </nav>
@@ -325,6 +325,22 @@ export default function SpreadsheetImport({ operation }: { operation: OperationK
           <span className="rounded-lg bg-slate-100 px-3 py-2">الصفوف الصالحة: {validCount}</span>
           <span className="rounded-lg bg-slate-100 px-3 py-2">المحدد للإضافة: {selectedCount}</span>
           <span className="rounded-lg bg-red-50 px-3 py-2 text-red-700">المستبعدة: {rows.filter((row) => Boolean(row.error)).length}</span>
+        </div>
+        <div className="import-mobile-cards">
+          {rows.map((row) => (
+            <article key={row.id} className={row.error ? "import-mobile-card import-mobile-card-error" : "import-mobile-card"}>
+              <label className="import-mobile-select">
+                <input type="checkbox" checked={row.checked} disabled={Boolean(row.error)} onChange={(event) => toggleRow(row.id, event.target.checked)} />
+                <span>إضافة الصف {row.rowNumber}</span>
+              </label>
+              <dl>
+                <div><dt>الصنف</dt><dd>{row.itemName || "—"}</dd></div>
+                <div><dt>الكمية</dt><dd dir="ltr">{row.quantity || "—"}</dd></div>
+                <div><dt>الوحدة</dt><dd>{row.unitName || "—"}</dd></div>
+              </dl>
+              <p>{row.error ? row.error : row.duplicate ? "تكرار محتمل — سيبقى كسطر مستقل" : "صالح"}</p>
+            </article>
+          ))}
         </div>
         <div className="overflow-x-auto rounded-2xl border border-[var(--border)] bg-white">
           <table className="w-full min-w-[640px] text-right text-sm">

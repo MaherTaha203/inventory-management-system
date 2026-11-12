@@ -74,3 +74,262 @@ button,input,select,textarea{font:inherit}
  .operation-form input:not([type=checkbox]),.operation-form select{min-height:46px;font-size:16px}
  .operation-save-button{position:sticky;bottom:10px;z-index:5;box-shadow:0 5px 22px rgba(23,108,80,.28)}
 }
+
+
+/* Native-feeling mobile application frame */
+@media (max-width: 767px) {
+  html, body {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  body {
+    height: 100dvh;
+    min-height: 100dvh;
+    background: var(--background);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  input, select, textarea, button {
+    font-size: 16px;
+  }
+  .mobile-app-shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: env(safe-area-inset-top);
+  }
+  .mobile-app-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .mobile-app-content::-webkit-scrollbar { display: none; }
+  .mobile-app-content > main {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100% !important;
+    height: auto;
+    padding-top: 18px;
+    padding-bottom: 24px;
+  }
+  .mobile-app-content .dashboard-shell {
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+    padding: 22px 16px 28px;
+  }
+  .mobile-app-content .operation-editor-shell {
+    min-height: 100% !important;
+    padding: 16px 14px 24px !important;
+  }
+  .mobile-app-content main > nav {
+    margin-bottom: 20px !important;
+  }
+  .mobile-app-content button,
+  .mobile-app-content a,
+  .mobile-app-content input,
+  .mobile-app-content select {
+    touch-action: manipulation;
+  }
+  .mobile-app-lock {
+    top: calc(env(safe-area-inset-top) + 8px) !important;
+    left: 12px !important;
+  }
+  .mobile-app-nav {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 3px;
+    min-height: 66px;
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+    background: #07513f;
+    border-top: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 -5px 22px rgba(20,55,42,.10);
+  }
+  .mobile-app-nav a {
+    display: flex;
+    min-width: 0;
+    min-height: 50px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border-radius: 13px;
+    color: rgba(255,255,255,.88);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.15;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-app-nav a[aria-current="page"] {
+    color: #123b30;
+    background: #d9eee5;
+  }
+  .mobile-app-nav svg { width: 22px; height: 22px; flex: 0 0 auto; }
+  .mobile-app-nav a:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+  }
+  .mobile-app-content table { max-width: 100%; }
+  .mobile-app-content .overflow-x-auto {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+@media (min-width: 768px) {
+  .mobile-app-shell { min-height: 100vh; }
+  .mobile-app-content { min-height: 100vh; }
+  .mobile-app-nav { display: none; }
+}
+@media (max-width: 380px) {
+  .mobile-app-nav { padding-inline: 4px; gap: 1px; }
+  .mobile-app-nav a { font-size: 10px; }
+  .mobile-app-nav svg { width: 20px; height: 20px; }
+}
+
+
+/* Page-by-page mobile layouts: retain the current visual language and workflows */
+@media (max-width: 767px) {
+  /* Home is the only screen that must not scroll vertically. */
+  .mobile-app-content:has(.dashboard-shell) { display: flex; flex-direction: column; overflow: hidden; }
+  .mobile-app-content .dashboard-shell {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    padding: 16px 15px 14px;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .mobile-app-content .dashboard-intro { padding-bottom: 14px; }
+  .mobile-app-content .primary-card { min-height: clamp(104px, 16svh, 132px); }
+  .mobile-app-content .secondary-section { margin-top: 14px; }
+  .mobile-app-content .secondary-grid { gap: 7px; }
+  .mobile-app-content .module-card { min-height: clamp(66px, 10.5svh, 86px); }
+  .mobile-app-content .module-icon { width: 31px; height: 31px; }
+  .mobile-app-content .module-card strong { font-size: 12px; }
+
+  /* Shared page heading and section rhythm. */
+  .mobile-app-content main:not(.dashboard-shell) { padding-inline: 14px !important; }
+  .mobile-app-content main:not(.dashboard-shell) > header { margin-bottom: 17px !important; }
+  .mobile-app-content main:not(.dashboard-shell) > header h1 { font-size: 24px; line-height: 1.35; }
+  .mobile-app-content main:not(.dashboard-shell) > header p { font-size: 13px; line-height: 1.7; }
+  .mobile-app-content main:not(.dashboard-shell) > nav { margin-bottom: 18px !important; min-height: 34px; }
+  .mobile-app-content main:not(.dashboard-shell) > nav a { min-height: 38px; display: inline-flex; align-items: center; }
+
+  /* Inventory and receiving entry/edit screens. */
+  .operation-editor-shell { padding: 14px 14px 28px !important; }
+  .operation-editor-heading { margin-bottom: 14px !important; }
+  .operation-editor-heading h1 { font-size: 23px !important; }
+  .operation-editor-heading p { font-size: 13px; line-height: 1.65; }
+  .operation-form { gap: 12px !important; padding-bottom: 8px; }
+  .operation-meta-card { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .operation-meta-card > label,
+  .operation-meta-card > div { width: 100%; min-width: 0; }
+  .operation-meta-card > div { margin-top: 0 !important; }
+  .operation-line-card { padding: 13px !important; }
+  .operation-line-fields { display: grid; grid-template-columns: minmax(0,1fr) minmax(92px,.62fr) !important; gap: 10px !important; }
+  .operation-line-fields > div:first-child { grid-column: 1 / -1 !important; }
+  .operation-line-fields > label { min-width: 0; }
+  .operation-form input:not([type=checkbox]),
+  .operation-form select,
+  .operation-form textarea { width: 100%; min-height: 48px; font-size: 16px !important; }
+  .operation-add-line { min-height: 50px; }
+  .operation-save-button { position: sticky; bottom: 8px; z-index: 6; min-height: 54px; margin-top: 4px; }
+  .operation-form > p:last-child { margin-bottom: 10px; }
+
+  /* Catalog lists: one section card per category, with stacked, tappable rows. */
+  .catalog-page > div.space-y-5 { display: flex; flex-direction: column; gap: 13px; }
+  .catalog-page > div.space-y-5 > section { padding: 15px !important; border-radius: 18px; }
+  .catalog-page > div.space-y-5 > section h2 { font-size: 19px; }
+  .catalog-page > div.space-y-5 > section > div:first-child p { font-size: 12px; line-height: 1.6; }
+  .catalog-page > div.space-y-5 > section > div.flex { display: grid; grid-template-columns: minmax(0,1fr); gap: 9px; }
+  .catalog-page > div.space-y-5 > section > div.flex input { min-width: 0; width: 100%; min-height: 49px; font-size: 16px; }
+  .catalog-page > div.space-y-5 > section > div.flex button { min-height: 48px; }
+  .catalog-page > div.space-y-5 > section ul li { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding-block: 13px; }
+  .catalog-page > div.space-y-5 > section ul li > div:last-child { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .catalog-page > div.space-y-5 > section ul li > div:last-child button { min-height: 43px; padding: 8px !important; font-size: 12px; }
+  .catalog-page [role=dialog] { max-height: calc(100% - 32px); overflow-y: auto; }
+
+  /* Reports: filters first, optional columns next, then actions and readable result cards. */
+  .reports-page > .grid.grid-cols-2 { min-height: 48px; }
+  .reports-page > .grid.grid-cols-2 button { min-height: 44px; font-size: 15px; }
+  .reports-page > section { padding: 13px !important; border-radius: 17px; }
+  .reports-page > section input:not([type=checkbox]) { width: 100%; min-width: 0; min-height: 48px; font-size: 16px; }
+  .reports-page > section label { display: block; }
+  .reports-page > section input[type=date] { display: block; }
+  .reports-page > section .flex.flex-wrap { gap: 12px 16px; }
+  .reports-page > section label:has(input[type=checkbox]) { display: inline-flex; align-items: center; min-height: 30px; }
+  .reports-page > div.flex.flex-wrap { align-items: stretch; gap: 10px; }
+  .reports-page > div.flex.flex-wrap > span { width: 100%; line-height: 1.6; }
+  .reports-page > div.flex.flex-wrap > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; gap: 8px; }
+  .reports-page > div.flex.flex-wrap button { min-height: 44px; font-size: 12px; }
+  .report-mobile-cards { display: grid; gap: 10px; }
+  .report-mobile-card { padding: 13px; border: 1px solid var(--border); border-radius: 15px; background: #fff; }
+  .report-mobile-card dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px 10px; }
+  .report-mobile-card dl > div { min-width: 0; }
+  .report-mobile-card dt { margin-bottom: 4px; color: var(--muted); font-size: 11px; }
+  .report-mobile-card dd { overflow-wrap: anywhere; font-size: 14px; font-weight: 700; }
+  .reports-page .overflow-x-auto { display: none; }
+
+  /* Archive: each operation remains a card; its line table can swipe horizontally. */
+  .archive-page > section { padding: 12px !important; }
+  .archive-page article { padding: 14px !important; border-radius: 17px; }
+  .archive-page article > div:first-child { gap: 9px; }
+  .archive-page article > div:first-child > div:last-child { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; }
+  .archive-page article > div:first-child > div:last-child a,
+  .archive-page article > div:first-child > div:last-child button { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; }
+  .archive-page article .overflow-x-auto { border-radius: 10px; }
+
+  /* Trash: clear status, readable record, large restore/delete actions. */
+  .trash-page > section { padding: 12px !important; }
+  .trash-page > section input,
+  .trash-page > section select { min-height: 48px; width: 100%; font-size: 16px; }
+  .trash-page article { gap: 12px !important; }
+  .trash-page article > div:last-child { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; }
+  .trash-page article button { min-height: 44px; }
+
+  /* Settings and item history. */
+  .settings-page form { padding: 16px !important; border-radius: 18px; }
+  .settings-page form label { display: block; font-size: 14px; }
+  .settings-page form input { width: 100%; min-height: 52px; font-size: 20px; }
+  .settings-page form button { min-height: 52px; }
+  .item-history-page > div.grid { grid-template-columns: minmax(0,1fr); gap: 13px; }
+  .item-history-page > div.grid > section { padding: 15px !important; border-radius: 17px; }
+
+  /* Excel import: one-step panels and mobile row cards instead of wide tables. */
+  .spreadsheet-import-page > section { padding: 15px !important; border-radius: 17px; }
+  .spreadsheet-import-page input[type=file] { min-height: 52px; font-size: 13px; }
+  .spreadsheet-import-page select { min-height: 48px; width: 100%; font-size: 16px; }
+  .spreadsheet-import-page button { min-height: 46px; }
+  .spreadsheet-import-page > section.space-y-4 > div.grid { grid-template-columns: minmax(0,1fr); }
+  .import-mobile-cards { display: grid; gap: 10px; }
+  .import-mobile-card { padding: 13px; border: 1px solid var(--border); border-radius: 15px; background: white; }
+  .import-mobile-card-error { border-color: #fecaca; background: #fffafa; }
+  .import-mobile-select { display: flex; align-items: center; gap: 10px; min-height: 36px; font-size: 13px; font-weight: 700; }
+  .import-mobile-select input { width: 20px; height: 20px; }
+  .import-mobile-card dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 10px; }
+  .import-mobile-card dt { color: var(--muted); font-size: 11px; }
+  .import-mobile-card dd { overflow-wrap: anywhere; font-size: 14px; font-weight: 700; }
+  .import-mobile-card > p { margin-top: 10px; font-size: 12px; line-height: 1.6; color: var(--muted); }
+  .spreadsheet-import-page .overflow-x-auto { display: none; }
+}
+@media (min-width: 768px) {
+  .report-mobile-cards, .import-mobile-cards { display: none; }
+}
+@media (max-width: 360px) {
+  .mobile-app-content .dashboard-shell { padding-inline: 11px; }
+  .mobile-app-content .module-card strong { font-size: 11px; }
+  .report-mobile-card dl { grid-template-columns: minmax(0,1fr); }
+}

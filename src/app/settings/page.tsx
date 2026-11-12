@@ -43,7 +43,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 py-8 sm:px-6">
+    <main className="settings-page mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 py-8 sm:px-6">
       <nav className="mb-8">
         <Link href="/" className="text-sm font-semibold text-[var(--accent)]">← الرئيسية</Link>
       </nav>

@@ -51,7 +51,7 @@ export default function ItemHistoryPage({ params }: { params: Promise<{ id: stri
   }, [params]);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-8 sm:px-6">
+    <main className="item-history-page mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-8 sm:px-6">
       <nav className="mb-8">
         <Link href="/catalog" className="text-sm font-semibold text-[var(--accent)]">← القوائم</Link>
       </nav>

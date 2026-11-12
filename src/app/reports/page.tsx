@@ -227,7 +227,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-8 sm:px-6">
+    <main className="reports-page mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-8 sm:px-6">
       <nav className="mb-8 flex items-center justify-between">
         <Link href="/" className="text-sm font-semibold text-[var(--accent)]">← الرئيسية</Link>
         <Link href="/archive" className="text-sm font-semibold text-[var(--accent)]">الأرشيف</Link>
@@ -276,12 +276,31 @@ export default function ReportsPage() {
 
       {loading ? <p role="status" className="rounded-xl border border-[var(--border)] bg-white p-5 text-sm text-[var(--muted)]">جارٍ تحميل التقرير…</p> :
         rows.length === 0 ? <p className="rounded-xl border border-[var(--border)] bg-white p-5 text-sm text-[var(--muted)]">لا توجد نتائج مطابقة لمعايير البحث.</p> :
+        <>
+        <div className="report-mobile-cards">
+          {rows.map((row, index) => {
+            const visibleColumns = definitions[kind].filter((column) => columns[kind].includes(column.key));
+            return (
+              <article className="report-mobile-card" key={index}>
+                <dl>
+                  {visibleColumns.map((column) => (
+                    <div key={column.key}>
+                      <dt>{column.label}</dt>
+                      <dd>{row[column.key] || "—"}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </article>
+            );
+          })}
+        </div>
         <div className="overflow-x-auto rounded-2xl border border-[var(--border)] bg-white">
           <table className="w-full min-w-[520px] text-right text-sm">
             <thead className="bg-slate-50 text-xs text-[var(--muted)]"><tr>{definitions[kind].filter((column) => columns[kind].includes(column.key)).map((column) => <th key={column.key} className="whitespace-nowrap px-4 py-3 font-semibold">{column.label}</th>)}</tr></thead>
             <tbody className="divide-y divide-[var(--border)]">{rows.map((row,index) => <tr key={index}>{definitions[kind].filter((column) => columns[kind].includes(column.key)).map((column) => <td key={column.key} className="whitespace-nowrap px-4 py-3">{row[column.key]}</td>)}</tr>)}</tbody>
           </table>
         </div>
+        </>
       }
 
       {totalPages > 1 && <div className="mt-5 flex items-center justify-between">
