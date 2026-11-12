@@ -212,7 +212,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (phase === "authenticated") {
     return (
       <>
-        <div className="fixed left-4 top-4 z-50">
+        <div className="mobile-app-lock fixed left-4 top-4 z-50">
           <button
             type="button"
             onClick={() => void lockNow()}
