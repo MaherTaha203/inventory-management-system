@@ -326,6 +326,22 @@ export default function SpreadsheetImport({ operation }: { operation: OperationK
           <span className="rounded-lg bg-slate-100 px-3 py-2">المحدد للإضافة: {selectedCount}</span>
           <span className="rounded-lg bg-red-50 px-3 py-2 text-red-700">المستبعدة: {rows.filter((row) => Boolean(row.error)).length}</span>
         </div>
+        <div className="import-mobile-cards">
+          {rows.map((row) => (
+            <article key={row.id} className={row.error ? "import-mobile-card import-mobile-card-error" : "import-mobile-card"}>
+              <label className="import-mobile-select">
+                <input type="checkbox" checked={row.checked} disabled={Boolean(row.error)} onChange={(event) => toggleRow(row.id, event.target.checked)} />
+                <span>إضافة الصف {row.rowNumber}</span>
+              </label>
+              <dl>
+                <div><dt>الصنف</dt><dd>{row.itemName || "—"}</dd></div>
+                <div><dt>الكمية</dt><dd dir="ltr">{row.quantity || "—"}</dd></div>
+                <div><dt>الوحدة</dt><dd>{row.unitName || "—"}</dd></div>
+              </dl>
+              <p>{row.error ? row.error : row.duplicate ? "تكرار محتمل — سيبقى كسطر مستقل" : "صالح"}</p>
+            </article>
+          ))}
+        </div>
         <div className="overflow-x-auto rounded-2xl border border-[var(--border)] bg-white">
           <table className="w-full min-w-[640px] text-right text-sm">
             <thead className="bg-slate-50 text-xs"><tr><th className="p-3">إضافة</th><th className="p-3">رقم الصف</th><th className="p-3">الصنف</th><th className="p-3">الكمية</th><th className="p-3">الوحدة</th><th className="p-3">الحالة</th></tr></thead>
