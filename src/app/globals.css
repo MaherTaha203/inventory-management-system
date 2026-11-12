@@ -313,7 +313,7 @@ button,input,select,textarea{font:inherit}
   .spreadsheet-import-page input[type=file] { min-height: 52px; font-size: 13px; }
   .spreadsheet-import-page select { min-height: 48px; width: 100%; font-size: 16px; }
   .spreadsheet-import-page button { min-height: 46px; }
-  .spreadsheet-import-page .grid.gap-3.sm\\:grid-cols-3 { grid-template-columns: minmax(0,1fr); }
+  .spreadsheet-import-page > section.space-y-4 > div.grid { grid-template-columns: minmax(0,1fr); }
   .import-mobile-cards { display: grid; gap: 10px; }
   .import-mobile-card { padding: 13px; border: 1px solid var(--border); border-radius: 15px; background: white; }
   .import-mobile-card-error { border-color: #fecaca; background: #fffafa; }
