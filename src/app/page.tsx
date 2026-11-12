@@ -29,11 +29,11 @@ export default function HomePage() {
         <Link className="primary-card primary-stocktake" href="/stocktakes">
           <span className="primary-card-icon"><ModuleIcon name="clipboard" /></span>
           <span className="primary-card-title">الجرد</span>
-        </a>
-        <a className="primary-card primary-receipt" href="/receipts">
+        </Link>
+        <Link className="primary-card primary-receipt" href="/receipts">
           <span className="primary-card-icon"><ModuleIcon name="package" /></span>
           <span className="primary-card-title">الاستلام</span>
-        </a>
+        </Link>
       </section>
       <section className="secondary-section" aria-label="وحدات النظام">
         <h2 className="section-title">الوحدات</h2>
@@ -42,7 +42,7 @@ export default function HomePage() {
             <Link className="module-card" href={module.href} key={module.href}>
               <span className={`module-icon tone-${module.tone}`}><ModuleIcon name={module.icon} /></span>
               <strong>{module.title}</strong>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
