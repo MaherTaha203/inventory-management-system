@@ -408,3 +408,17 @@ main[class$="-page"] .text-\[var\(--muted\)\]{color:var(--muted)}
  .mobile-app-content .module-card{min-height:58px}
  .mobile-app-content .module-icon{width:26px;height:26px}
 }
+
+
+/* Dashboard tiles follow the supplied green inventory-app reference */
+.primary-stocktake{background:#125b39;border-color:#0d4b2f;color:#fff}
+.primary-receipt{background:#176c45;border-color:#125b39;color:#fff}
+.module-card{background:#318b43;border-color:#28783a;color:#fff;box-shadow:0 5px 14px rgba(17,84,42,.12)}
+.module-card:hover{background:#287c3b;border-color:#206b32;box-shadow:0 9px 20px rgba(17,84,42,.18)}
+.module-card strong{color:#fff}
+.module-icon,.tone-mint,.tone-blue,.tone-rose,.tone-slate{background:rgba(255,255,255,.13);color:#fff}
+.primary-card-icon{background:rgba(255,255,255,.16)}
+@media(max-width:767px){
+ .mobile-app-content .module-card{min-height:clamp(66px,10.8svh,86px)}
+ .mobile-app-content .module-card strong{font-size:12px;font-weight:800}
+}
