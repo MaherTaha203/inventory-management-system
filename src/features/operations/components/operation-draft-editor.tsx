@@ -312,7 +312,7 @@ export default function OperationDraftEditor({
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-8 sm:px-6">
+    <main className="operation-editor-shell mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-8 sm:px-6">
       <nav className="mb-8 flex items-center justify-between gap-3">
         <Link href="/" className="text-sm font-semibold text-[var(--accent)]">← الرئيسية</Link>
         <div className="flex items-center gap-3">
@@ -328,7 +328,7 @@ export default function OperationDraftEditor({
         </div>
       </nav>
 
-      <header className="mb-7">
+      <header className="operation-editor-heading mb-5">
         <h1 className="text-2xl font-bold">{title}</h1>
         <p className="mt-2 text-sm leading-7 text-[var(--muted)]">
 تحفظ التغييرات تلقائياً على هذا الجهاز، ولا تُرسل إلى السجلات المركزية إلا عند الضغط على حفظ العملية.
@@ -382,7 +382,7 @@ export default function OperationDraftEditor({
       )}
 
       {phase === "editing" && payload && (
-        <section className="space-y-5">
+        <section className="operation-form space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-white px-4 py-3">
             <span className="text-sm font-medium">حفظ المسودة محلياً</span>
             <span role="status" className="text-xs text-[var(--muted)]">
@@ -390,7 +390,7 @@ export default function OperationDraftEditor({
             </span>
           </div>
 
-          <div className="rounded-2xl border border-[var(--border)] bg-white p-5">
+          <div className="operation-meta-card rounded-2xl border border-[var(--border)] bg-white p-4 sm:p-5">
             <label className="block text-sm font-semibold" htmlFor="operation-date">التاريخ (يوم/شهر/سنة)</label>
             <input
               id="operation-date"
@@ -420,7 +420,7 @@ export default function OperationDraftEditor({
 
           <div className="space-y-3">
             {payload.lines.map((line, index) => (
-              <article key={line.id} className="rounded-2xl border border-[var(--border)] bg-white p-4 sm:p-5">
+              <article key={line.id} className="operation-line-card rounded-2xl border border-[var(--border)] bg-white p-4 sm:p-5">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="font-semibold">الصنف {index + 1}</h2>
                   {payload.lines.length > 1 && (
@@ -429,7 +429,7 @@ export default function OperationDraftEditor({
                     </button>
                   )}
                 </div>
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="operation-line-fields grid gap-3 sm:grid-cols-3">
                   <div className="sm:col-span-3">
                     <CatalogNameInput
                       kind="items"
@@ -472,7 +472,7 @@ export default function OperationDraftEditor({
             ))}
           </div>
 
-          <button onClick={addLine} className="w-full rounded-xl border border-dashed border-[var(--accent)] bg-white px-4 py-3 text-sm font-semibold text-[var(--accent)]">
+          <button onClick={addLine} className="operation-add-line w-full rounded-xl border border-dashed border-[var(--accent)] bg-white px-4 py-3 text-sm font-semibold text-[var(--accent)]">
             + إضافة صنف
           </button>
           {errorMessage && (
@@ -489,7 +489,7 @@ export default function OperationDraftEditor({
             type="button"
             onClick={() => void saveCentral()}
             disabled={submitting || saveState !== "saved"}
-            className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="operation-save-button w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting
               ? "جارٍ الحفظ…"
