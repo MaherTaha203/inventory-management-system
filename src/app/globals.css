@@ -691,3 +691,13 @@ main.operation-list-page{width:min(100% - 36px,1040px);min-height:100vh;margin-i
  .mobile-app-content .trash-page>div.overflow-hidden ul{max-height:none}
  .mobile-app-content .settings-page form input{margin-top:6px}
 }
+
+@media(max-width:767px){
+ .mobile-app-content main button{width:100%;min-height:52px}
+ .mobile-app-content .operation-pagination button{width:42%;min-width:0}
+ .mobile-app-content .operation-editor-shell section:not([role=alert])>p:not([role]){display:none}
+ .mobile-app-content .catalog-kind-tabs button{width:100%;min-height:48px}
+ .mobile-app-content .reports-page>div.flex.flex-wrap.items-center button{width:100%}
+ .mobile-app-content .operation-list-shortcuts a{width:100%}
+ .mobile-app-content .operation-record-actions a{width:100%}
+}
