@@ -48,6 +48,7 @@ export default function CatalogPage() {
     id: string;
     name: string;
   } | null>(null);
+  const [activeKind, setActiveKind] = useState<CatalogKind>("items");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -141,6 +142,20 @@ export default function CatalogPage() {
         </p>
       </header>
 
+      <div className="catalog-kind-tabs" role="group" aria-label="نوع القائمة">
+        {sections.map((section) => (
+          <button
+            key={section.kind}
+            type="button"
+            aria-pressed={activeKind === section.kind}
+            onClick={() => setActiveKind(section.kind)}
+            className={activeKind === section.kind ? "catalog-kind-tab catalog-kind-tab-active" : "catalog-kind-tab"}
+          >
+            {section.title}
+          </button>
+        ))}
+      </div>
+
       {error && (
         <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
           <p>{error}</p>
@@ -166,7 +181,7 @@ export default function CatalogPage() {
         </p>
       ) : (
         <div className="space-y-5">
-          {sections.map((section) => (
+          {sections.filter((section) => section.kind === activeKind).map((section) => (
             <section
               key={section.kind}
               className="rounded-2xl border border-[var(--border)] bg-white p-5"
