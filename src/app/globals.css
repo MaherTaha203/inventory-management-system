@@ -667,3 +667,27 @@ main.operation-list-page{width:min(100% - 36px,1040px);min-height:100vh;margin-i
   .archive-page article>div:first-child>div:last-child{grid-template-columns:1fr 1fr}
   .archive-page article>div:first-child>div:last-child>*:last-child{grid-column:1/-1}
 }
+
+
+/* Catalog selector and remaining native app screens */
+.catalog-kind-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 14px;padding:4px;border-radius:14px;background:#e8f0ea}
+.catalog-kind-tab{min-width:0;min-height:48px;padding:9px 7px;border:1px solid transparent;border-radius:11px;background:transparent;color:#42604f;font-size:14px;font-weight:800}
+.catalog-kind-tab-active{border-color:#d9e7dc;background:#fff;color:#155c39;box-shadow:0 2px 8px rgba(24,70,42,.08)}
+@media(max-width:767px){
+ .catalog-kind-tabs{position:sticky;top:0;z-index:4;grid-template-columns:repeat(3,minmax(0,1fr));margin:0 0 12px;padding:3px;background:#e8f0ea}
+ .catalog-kind-tab{min-height:49px;font-size:13px}
+ .catalog-page section>div:first-child h2{font-size:16px}
+ .catalog-page section ul li>div:first-child a,
+ .catalog-page section ul li>div:first-child span{font-size:15px}
+ .operation-editor-shell .operation-form>p:last-child{display:none}
+ .operation-editor-shell .operation-form>div:first-child span[role=status]{font-size:11px}
+ .mobile-app-content .rounded-2xl.border{border-radius:14px}
+ .mobile-app-content .bg-white{background:#fff}
+ .mobile-app-content .text-sm.leading-7{line-height:1.55}
+ .mobile-app-content .reports-page .report-mobile-card dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .mobile-app-content .reports-page .report-mobile-card dl>div{min-width:0;padding:9px;border-radius:10px;background:#f3f8f4}
+ .mobile-app-content .reports-page .report-mobile-card dt{color:var(--muted);font-size:11px}
+ .mobile-app-content .reports-page .report-mobile-card dd{overflow-wrap:anywhere;margin-top:3px;color:var(--foreground);font-size:14px;font-weight:800}
+ .mobile-app-content .trash-page>div.overflow-hidden ul{max-height:none}
+ .mobile-app-content .settings-page form input{margin-top:6px}
+}
